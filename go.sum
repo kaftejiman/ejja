@@ -1,2 +1,12 @@
+github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/docopt/docopt.go v0.0.0-20180111231733-ee0de3bc6815 h1:HMAfwOa33y82IaQEKQDfUCiwNlxtM1iw7HLM9ru0RNc=
 github.com/docopt/docopt.go v0.0.0-20180111231733-ee0de3bc6815/go.mod h1:l7JNRynTRuqe45tpIyItHNqZWTxywYjp87MWTOnU5cg=
+github.com/henrylee2cn/aster v0.7.3 h1:1IAzmNigF+6jyjiAdzoplqCjDSW9FQ4QtZ87Dg4hgyo=
+github.com/henrylee2cn/aster v0.7.3/go.mod h1:aFMXi+kligR14EEh6HCHlqZjoF6eTLLPXwTEYNmwsho=
+github.com/henrylee2cn/goutil v0.0.0-20190905105130-36491ec82b74 h1:1tSMnPEhX5mGbXNm9uqoixJiJw6VZ7mFbYMf+Tm4y9Q=
+github.com/henrylee2cn/goutil v0.0.0-20190905105130-36491ec82b74/go.mod h1:I9qYeMYwdKC7UFXMECNzCEv0fYuolqLeBMqsmeG7IVo=
+github.com/henrylee2cn/structtag v1.1.0 h1:gCWDkSMscG4MCOsdP9fpENeird3KxuKcStzAl+xP0a0=
+github.com/henrylee2cn/structtag v1.1.0/go.mod h1:qmrObf6fG2vu3RphREGq4q5o7ADGPWeu6tZRn7uP7CQ=
+github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=

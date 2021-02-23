@@ -9,8 +9,9 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "${file}",
-            "args": ["run", "--project=test", "--module=analyser"]
+            //"program": "${file}",
+            "program":"${workspaceFolder}\\main.go",
+            "args": ["run", "--project=\"C:\\Users\\kaftejiman\\obfuscators\\ejja\\samples\\\"", "--module=analyser","--functions=a"]
         }
     ]
 }

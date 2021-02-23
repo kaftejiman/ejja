@@ -61,7 +61,9 @@ func main() {
 		modules.List()
 		break
 	case arguments.Run:
-		fmt.Println("project:", arguments.Project, " module:", arguments.Module, " functions:", arguments.Functions)
+		utils.TestWalker(arguments.Project)
+
+		//fmt.Println("project:", arguments.Project, " module:", arguments.Module, " functions:", arguments.Functions)
 		modules.Run(arguments.Module, arguments.Project, arguments.Functions)
 		break
 	}

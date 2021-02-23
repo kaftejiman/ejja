@@ -1,4 +1,4 @@
-package main
+package test
 
 import (
 	"fmt"
@@ -7,10 +7,13 @@ import (
 
 // FibonacciRecursion recursive fibonacci
 func FibonacciRecursion(n int) int {
-	if n <= 1 {
-		return n
+	{
+		if n <= 1 {
+			return n
+		}
+		return FibonacciRecursion(n-1) + FibonacciRecursion(n-2)
 	}
-	return FibonacciRecursion(n-1) + FibonacciRecursion(n-2)
+
 }
 
 func main() {

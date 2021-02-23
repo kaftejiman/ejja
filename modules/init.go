@@ -1,6 +1,9 @@
 package modules
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 var module Module
 
@@ -37,6 +40,9 @@ func selection(name string) {
 	case "flattener":
 		module = newFlattenerModule()
 		break
+	default:
+		fmt.Println("Error: module doesnt exist, please run list command for listing the available modules.")
+		os.Exit(-1)
 	}
 
 }
