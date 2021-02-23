@@ -5,44 +5,42 @@ import (
 	"log"
 
 	"github.com/docopt/docopt.go"
+	modules "github.com/kaftejiman/ejja/modules"
+	"github.com/kaftejiman/ejja/utils"
 )
 
 var arguments struct {
-	Obfuscate bool     `docopt:"obfuscate"`
-	Analyse   bool     `docopt:"analyse"`
-	List      bool     `docopt:"list"`
-	Project   string   `docopt:"-p,--project"`
-	Module    string   `docopt:"-m,--module"`
-	Function  []string `docopt:"-f,--function"`
-	Verbose   bool     `docopt:"--verbose"`
+	Run      bool     `docopt:"run"`
+	List     bool     `docopt:"list"`
+	Project  string   `docopt:"-p,--project"`
+	Module   string   `docopt:"-m,--module"`
+	Function []string `docopt:"-f,--function"`
+	Verbose  bool     `docopt:"--verbose"`
 }
 
 func init() {
 
 	var (
 		usage = `
-
-	Golang source code level obfuscator. 
-	Usage:
-	ejja obfuscate  --project <path_to_project> [--module <obfuscation_module_name>] [--function <target_function>]
-	ejja analyse    --project <path_to_project>
+Golang source code level obfuscator. 
+Usage:
+	ejja run --project <path> [--module <module> [--function <functions>]]
 	ejja list
 	ejja -h | --help
 	ejja --version
 
 	Options:
-	obfuscate                                   Applies the selected obfuscation module.
-	analyse                                     Runs project wide source code level analysis.
-	list                                        Lists available obfuscation modules.
-	-p --project <path_to_project>              Absolute path to your Golang project. 
-	-m --module <obfuscation_module_name>       The obfuscation module to apply on target project.
-	-f --function <target_function>             Target function/functions for obfuscation. Optional.
-	-h --help                                   Shows this screen.
-	--verbose                                   Shows details.
-	--version                                   Shows version.`
+	run                                     Runs the selected module.
+	list                                    Lists available modules.
+	-p --project <path>                     Absolute path to your Golang project. 
+	-m --module <module>                    The obfuscation module to apply on target project.
+	-f --function <function>                Target function or functions for obfuscation. Optional.
+	-h --help                               Shows this screen.
+	--verbose                               Shows details.
+	--version                               Shows version.`
 	)
 
-	opts, err := docopt.ParseArgs(usage, nil, "0.1.0")
+	opts, err := docopt.ParseArgs(usage, nil, utils.Version)
 	if err != nil {
 		log.Fatalln(err)
 		return
@@ -59,20 +57,16 @@ func init() {
 func main() {
 
 	switch {
-	case arguments.Analyse:
-		fmt.Println("project: ", arguments.Project)
-		// delegate to project analyser
-
 	case arguments.List:
-		fmt.Println("some modules..")
-		// list obfuscation modules available
-
-	case arguments.Obfuscate:
-		fmt.Println("project:", arguments.Project, " module: ", arguments.Module, " function: ", arguments.Function)
-		// delegate to corresponding obfuscation module with optional args
-
+		modules.List()
+		break
+	case arguments.Run:
+		fmt.Println("project:", arguments.Project, " module:", arguments.Module, " function:", arguments.Function)
+		modules.Run(arguments.Module, arguments.Project)
+		break
 	}
 
+	fmt.Println("main finished")
 	/*
 		src, err := ioutil.ReadFile("samples/fib.go")
 		fmt.Print(string(src))
