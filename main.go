@@ -10,12 +10,12 @@ import (
 )
 
 var arguments struct {
-	Run      bool     `docopt:"run"`
-	List     bool     `docopt:"list"`
-	Project  string   `docopt:"-p,--project"`
-	Module   string   `docopt:"-m,--module"`
-	Function []string `docopt:"-f,--function"`
-	Verbose  bool     `docopt:"--verbose"`
+	Run       bool   `docopt:"run"`
+	List      bool   `docopt:"list"`
+	Project   string `docopt:"-p,--project"`
+	Module    string `docopt:"-m,--module"`
+	Functions string `docopt:"-f,--functions"`
+	Verbose   bool   `docopt:"--verbose"`
 }
 
 func init() {
@@ -24,7 +24,7 @@ func init() {
 		usage = `
 Golang source code level obfuscator. 
 Usage:
-	ejja run --project <path> [--module <module> [--function <functions>]]
+	ejja run --project <path> [--module <module> [--functions <functions>]]
 	ejja list
 	ejja -h | --help
 	ejja --version
@@ -34,7 +34,7 @@ Usage:
 	list                                    Lists available modules.
 	-p --project <path>                     Absolute path to your Golang project. 
 	-m --module <module>                    The obfuscation module to apply on target project.
-	-f --function <function>                Target function or functions for obfuscation. Optional.
+	-f --functions <functions>              Target function or functions for obfuscation. Optional.
 	-h --help                               Shows this screen.
 	--verbose                               Shows details.
 	--version                               Shows version.`
@@ -61,8 +61,8 @@ func main() {
 		modules.List()
 		break
 	case arguments.Run:
-		fmt.Println("project:", arguments.Project, " module:", arguments.Module, " function:", arguments.Function)
-		modules.Run(arguments.Module, arguments.Project)
+		fmt.Println("project:", arguments.Project, " module:", arguments.Module, " functions:", arguments.Functions)
+		modules.Run(arguments.Module, arguments.Project, arguments.Functions)
 		break
 	}
 

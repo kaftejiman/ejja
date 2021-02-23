@@ -19,6 +19,6 @@ func (*FlattenerModule) manifest() {
 	fmt.Print("this is flattener manifestation\n")
 }
 
-func (m *FlattenerModule) run(project ...string) {
-	fmt.Print("flattener is running with project path\n", project[0])
+func (m *FlattenerModule) run(project string, functions ...string) {
+	fmt.Print("flattener is running with project path ", project, " functions are ", functions[0], "\n")
 }

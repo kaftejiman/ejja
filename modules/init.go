@@ -4,19 +4,20 @@ import "fmt"
 
 // Module interface of modules
 type Module interface {
-	run(project ...string)
+	run(project string, functions ...string)
 	manifest()
 }
 
 type template struct {
 	implement
-	name    string
-	project string
+	name     string
+	project  string
+	function string
 }
 
 type implement interface {
 	manifest()
-	run(project ...string)
+	run(project string, functions ...string)
 }
 
 func newTemplate(impl implement) *template {
@@ -29,24 +30,24 @@ func (t *template) manifest() {
 	fmt.Print("This is a manifestation of a module:\n")
 }
 
-func (t *template) run(project ...string) {
-	t.project = project[0]
+func (t *template) run(project string) {
+	t.project = project
 	fmt.Print("loaded module\n")
-	t.implement.run()
+	t.implement.run(project)
 	fmt.Print("finished running\n")
 }
 
 // Run specified module with optional project argumnent
-func Run(name string, project ...string) {
+func Run(name string, project string, functions ...string) {
 	var module Module
 	switch name {
 	case "analyser":
 		module = newAnalyserModule()
-		module.run(project...)
+		module.run(project, functions...)
 		break
 	case "flattener":
 		module = newFlattenerModule()
-		module.run(project...)
+		module.run(project, functions...)
 		break
 	}
 

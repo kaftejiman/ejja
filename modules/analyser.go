@@ -19,6 +19,6 @@ func (*AnalyserModule) manifest() {
 	fmt.Print("this is analyser manifestation \n")
 }
 
-func (m *AnalyserModule) run(project ...string) {
-	fmt.Print("analyser is running with project path ", project[0], "\n")
+func (m *AnalyserModule) run(project string, functions ...string) {
+	fmt.Print("analyser is running with project path ", project, "functions are : ", functions, "\n")
 }
