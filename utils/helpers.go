@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 
-	"github.com/kaftejiman/ejja/aster"
+	"github.com/henrylee2cn/aster/aster"
 )
 
 func readBody(fa aster.Facade) bool {
@@ -34,7 +34,7 @@ func readBody(fa aster.Facade) bool {
 
 // TestWalker test
 func TestWalker(project string) {
-	prog, _ := aster.LoadDirs("C:\\Users\\kaftejiman\\obfuscators\\ejja\\samples")
+	prog, _ := aster.LoadDirs("C:\\Users\\kaftejiman\\obfuscators\\ejja\\samples\\")
 	prog.Inspect(readBody)
 
 	_ = prog.Rewrite()
