@@ -60,7 +60,7 @@ Each module should provide two required methods:
 ## Known issues
 ## Requirements
 
-* [Henrylee2cn aster](https://github.com/henrylee2cn/aster/aster)
+* [Henrylee2cn aster](https://github.com/henrylee2cn/aster)
 
 ## Release Notes
 
