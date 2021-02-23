@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 
-	"github.com/kaftejiman/aster/aster"
+	"github.com/kaftejiman/ejja/aster"
 )
 
 func readBody(fa aster.Facade) bool {
