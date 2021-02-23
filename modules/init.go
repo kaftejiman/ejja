@@ -2,6 +2,8 @@ package modules
 
 import "fmt"
 
+var module Module
+
 // Module interface of modules
 type Module interface {
 	run(project string, functions ...string)
@@ -26,6 +28,19 @@ func newTemplate(impl implement) *template {
 	}
 }
 
+func selection(name string) {
+
+	switch name {
+	case "analyser":
+		module = newAnalyserModule()
+		break
+	case "flattener":
+		module = newFlattenerModule()
+		break
+	}
+
+}
+
 func (t *template) manifest() {
 	fmt.Print("This is a manifestation of a module:\n")
 }
@@ -39,32 +54,16 @@ func (t *template) run(project string) {
 
 // Run specified module with optional project argumnent
 func Run(name string, project string, functions ...string) {
-	var module Module
-	switch name {
-	case "analyser":
-		module = newAnalyserModule()
-		module.run(project, functions...)
-		break
-	case "flattener":
-		module = newFlattenerModule()
-		module.run(project, functions...)
-		break
-	}
+
+	selection(name)
+	module.run(project, functions...)
 
 }
 
 // Manifest specified module
 func Manifest(name string) {
-	var module Module
-	switch name {
-	case "analyser":
-		module = newAnalyserModule()
-		break
-	case "flattener":
-		module = newFlattenerModule()
-		break
-	}
 
+	selection(name)
 	module.manifest()
 
 }
