@@ -53,11 +53,3 @@ func LoadDirs(dirs ...string) (*aster.Program, error) {
 	}
 	return p.Load()
 }
-
-func TestHelper(project string) {
-	prog, _ := LoadDirs(project)
-	prog.Inspect(readBodyifFibonnaci)
-
-	_ = prog.Rewrite()
-
-}

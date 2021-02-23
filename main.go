@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/docopt/docopt.go"
@@ -61,39 +60,8 @@ func main() {
 		modules.List()
 		break
 	case arguments.Run:
-		utils.TestHelper(arguments.Project)
-
-		//fmt.Println("project:", arguments.Project, " module:", arguments.Module, " functions:", arguments.Functions)
 		modules.Run(arguments.Module, arguments.Project, arguments.Functions)
 		break
 	}
-
-	fmt.Println("main finished")
-	/*
-		src, err := ioutil.ReadFile("samples/fib.go")
-		fmt.Print(string(src))
-		fset := token.NewFileSet()
-		node, err := parser.ParseFile(fset, "demo", src, parser.ParseComments)
-		var out ast.Node
-		if err != nil {
-			panic(err)
-		}
-
-		visitorFunc := func(n ast.Node) bool {
-			funcDecl, ok := n.(*ast.FuncDecl)
-			if !ok {
-				return true
-			}
-			out = funcDecl.Body
-			fmt.Printf("Found func at: %d:%d\n",
-				fset.Position(funcDecl.Pos()).Line,
-				fset.Position(funcDecl.Pos()).Column,
-			)
-			return true
-		}
-
-		ast.Inspect(node, visitorFunc)
-		ast.Fprint(os.Stdout, fset, out, nil)
-		//printer.Fprint(os.Stdout, fset, node)*/
 
 }
