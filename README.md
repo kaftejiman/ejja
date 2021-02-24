@@ -18,6 +18,8 @@ Usage:
 ```
 λ ejja run --project "C:\Users\kaftejiman\sampleGolangProject" --module "analyser"
 
+[+] Generating summary..
+
 === Object Summary ===
 
 basic objects        : 2
@@ -30,6 +32,14 @@ signature objects    : 29
 interface objects    : 3
 map objects          : 0
 chan objects         : 1
+
+λ ejja run --project "C:\Users\kaftejiman\sampleGolangProject" --module "flattener" --function "main"
+
+[+] Running flattener..
+[+] Found function main in C:\Users\kaftejiman\sampleGolangProject\main.go, flattening..
+
+[+] Done.
+
 ```
 
 ![quickstart](https://raw.githubusercontent.com/kaftejiman/ejja/main/assets/quickstart.gif)

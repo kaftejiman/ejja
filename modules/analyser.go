@@ -88,8 +88,8 @@ func Set(ptr interface{}, tag string) error {
 }
 
 func generateSummary(project string) bool {
+	fmt.Println("[+] Generating summary..")
 	return objectSummary(project)
-
 }
 
 func objectSummary(project string) bool {

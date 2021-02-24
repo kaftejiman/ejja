@@ -32,6 +32,7 @@ func (*FlattenerModule) manifest() {
 }
 
 func (m *FlattenerModule) run(project string, functions ...string) {
+	fmt.Println("[+] Running flattener..")
 	functions = utils.Validate(functions)
 	program, _ := utils.LoadDirs(project)
 
@@ -48,7 +49,7 @@ func flatten(program *aster.Program, function string) {
 		if fa.Name() != currFunction {
 			return true
 		}
-		fmt.Printf("[+] Found function `%s` in `%s`, transforming..\n", currFunction, fa.File().Filename)
+		fmt.Printf("[+] Found function `%s` in `%s`, flattening..\n", currFunction, fa.File().Filename)
 		var rootNode ast.Node = fa.Node()
 		fmt.Println(rootNode)
 		//rootNode
