@@ -49,7 +49,7 @@ func selection(name string) {
 		module = newFlattenerModule()
 		break
 	default:
-		fmt.Println("Error: module doesnt exist, please run list command for listing the available modules.")
+		fmt.Println("Error: module doesnt exist, please run `list` command for listing the available modules.")
 		os.Exit(-1)
 	}
 

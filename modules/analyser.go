@@ -143,18 +143,18 @@ func objectSummary(project string) bool {
 	}
 
 	fmt.Printf(`
-		=== Object Summary ===
+=== Object Summary ===
 
-	basic objects        : %d
-	array objects        : %d
-	slice objects        : %d
-	struct objects       : %d
-	pointer objects      : %d
-	tuple objects        : %d
-	signature objects    : %d
-	interface objects    : %d
-	map objects          : %d
-	chan objects         : %d
+basic objects      : %d
+array objects      : %d
+slice objects      : %d
+struct objects     : %d
+pointer objects    : %d
+tuple objects      : %d
+signature objects  : %d
+interface objects  : %d
+map objects        : %d
+chan objects       : %d
 
 	`, summ.basicObj, summ.arrayObj, summ.sliceObj,
 		summ.structObj, summ.pointerObj, summ.tupleObj,

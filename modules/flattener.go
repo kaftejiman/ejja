@@ -3,8 +3,6 @@ package modules
 import (
 	"fmt"
 	"go/ast"
-	"os"
-	"strings"
 
 	aster "github.com/henrylee2cn/aster/aster"
 	"github.com/kaftejiman/ejja/utils"
@@ -28,39 +26,19 @@ func newFlattenerModule() Module {
 func (*FlattenerModule) manifest() {
 	fmt.Printf("Name: %s\n", "flattener")
 	fmt.Printf("Usage: %s\n", "ejja --project=\"example/project\" --module=\"flattener\" --function=\"main\"")
-	fmt.Printf("Description: %s\n", `Flattens the target function's control flow.
+	fmt.Printf("Description: %s\n", `Flattens the target function's control flow graph.
 	More: http://ac.inf.elte.hu/Vol_030_2009/003.pdf
 	`)
 }
 
 func (m *FlattenerModule) run(project string, functions ...string) {
-	functions = validate(functions)
-	fmt.Print("flattener is running with project path ", project, " functions are ", functions, "\n")
+	functions = utils.Validate(functions)
 	program, _ := utils.LoadDirs(project)
 
 	for i := range functions {
 		flatten(program, functions[i])
 	}
 
-}
-
-func validate(functions []string) []string {
-	out := []string{}
-	fn := []string{}
-	for i := range functions {
-		fn = strings.Split(functions[i], ",")
-		for j := range fn {
-			if fn[j] == "" {
-				continue
-			}
-			out = append(out, fn[j])
-		}
-	}
-	if len(out) == 0 {
-		fmt.Println("Error: no functions given.")
-		os.Exit(-1)
-	}
-	return out
 }
 
 func flatten(program *aster.Program, function string) {
@@ -70,10 +48,10 @@ func flatten(program *aster.Program, function string) {
 		if fa.Name() != currFunction {
 			return true
 		}
-
-		var node ast.Node = fa.Node()
-		fmt.Println(node)
-
+		fmt.Printf("[+] Found function `%s` in `%s`, transforming..\n", currFunction, fa.File().Filename)
+		var rootNode ast.Node = fa.Node()
+		fmt.Println(rootNode)
+		//rootNode
 		return true
 	})
 	//_ = program.Rewrite()

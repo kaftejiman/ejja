@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/henrylee2cn/aster/aster"
 )
@@ -28,4 +29,25 @@ func LoadDirs(dirs ...string) (*aster.Program, error) {
 		}
 	}
 	return p.Load()
+}
+
+// Validate Validates given functions removes empty functions if found exits when no function given
+// returns the clean list of functions
+func Validate(functions []string) []string {
+	out := []string{}
+	fn := []string{}
+	for i := range functions {
+		fn = strings.Split(functions[i], ",")
+		for j := range fn {
+			if fn[j] == "" {
+				continue
+			}
+			out = append(out, fn[j])
+		}
+	}
+	if len(out) == 0 {
+		fmt.Println("Error: no functions given.")
+		os.Exit(-1)
+	}
+	return out
 }
