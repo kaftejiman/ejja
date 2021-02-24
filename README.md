@@ -7,10 +7,6 @@ Runs the selected module on the target project.
 
 *Please report any bugs you encounter.*
 
-## Overview
-
-![overview](https://raw.githubusercontent.com/kaftejiman/ejja/main/assets/overview.png)
-
 ## Architecture
 
 ![architecture](https://raw.githubusercontent.com/kaftejiman/ejja/main/assets/architecture.png)
