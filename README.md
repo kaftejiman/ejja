@@ -18,7 +18,7 @@ Usage:
 ```
 λ ejja run --project "C:\Users\kaftejiman\sampleGolangProject" --module "analyser"
 
-[+] Generating summary..
+[+] Running analyser..
 
 === Object Summary ===
 
