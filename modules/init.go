@@ -55,17 +55,6 @@ func selection(name string) {
 
 }
 
-func (t *template) manifest() {
-	fmt.Print("This is a manifestation of a module:\n")
-}
-
-func (t *template) run(project string) {
-	t.project = project
-	fmt.Print("loaded module\n")
-	t.implement.run(project)
-	fmt.Print("finished running\n")
-}
-
 // Run specified module with optional project argumnent
 func Run(name string, project string, functions ...string) {
 
@@ -83,7 +72,7 @@ func Manifest(name string) {
 // List available modules
 func List() {
 	fmt.Println("_____________________________________________________________________")
-	for i := 0; i < len(modules); i++ {
+	for i := range modules {
 		Manifest(modules[i])
 		fmt.Println("_____________________________________________________________________")
 	}

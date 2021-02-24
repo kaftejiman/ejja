@@ -50,7 +50,8 @@ func (m *AnalyserModule) run(project string, functions ...string) {
 func setField(field reflect.Value, defaultVal string) error {
 
 	if !field.CanSet() {
-		return fmt.Errorf("Can't set value\n")
+		_, err := fmt.Println("Can't set value")
+		return err
 	}
 
 	switch field.Kind() {

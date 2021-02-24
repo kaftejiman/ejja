@@ -65,20 +65,18 @@ func validate(functions []string) []string {
 
 func flatten(program *aster.Program, function string) {
 	currFunction = function
-	program.Inspect(flattenFunction)
-	//_ = program.Rewrite()
-}
+	program.Inspect(func(fa aster.Facade) bool {
 
-func flattenFunction(fa aster.Facade) bool {
+		if fa.Name() != currFunction {
+			return true
+		}
 
-	if fa.Name() != currFunction {
+		var node ast.Node = fa.Node()
+		fmt.Println(node)
+
 		return true
-	}
-
-	var node ast.Node = fa.Node()
-	fmt.Println(node)
-
-	return true
+	})
+	//_ = program.Rewrite()
 }
 
 func flattenBlock() {
