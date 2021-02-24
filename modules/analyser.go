@@ -36,7 +36,9 @@ func newAnalyserModule() Module {
 }
 
 func (*AnalyserModule) manifest() {
-	fmt.Print("this is analyser manifestation \n")
+	fmt.Printf("Name: %s\n", "analyser")
+	fmt.Printf("Usage: %s\n", "ejja --project=\"example/project\" --module=\"analyser\"")
+	fmt.Printf("Description: %s\n", `Runs an analysis on the target project's codebase, returns summary of object analysis.`)
 }
 
 func (m *AnalyserModule) run(project string, functions ...string) {
@@ -129,7 +131,7 @@ func objectSummary(project string) bool {
 			summ.chanObj++
 			break
 		default:
-			fmt.Errorf("error generate summary")
+			fmt.Println("error generate summary")
 			break
 		}
 		return true

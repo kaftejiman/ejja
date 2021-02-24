@@ -8,31 +8,6 @@ import (
 	"github.com/henrylee2cn/aster/aster"
 )
 
-func readBodyifFibonnaci(fa aster.Facade) bool {
-
-	if fa.Name() != "FibonacciRecursion" {
-		return true
-	}
-	body, _ := fa.Body()
-	fmt.Println("name:", fa.Name(), "body:", body)
-
-	//fa.CoverBody(body)
-
-	/*for i := fa.NumFields() - 1; i >= 0; i-- {
-		field := fa.Field(i)
-		if !field.Exported() {
-			continue
-		}
-		field.Tags().Set(&aster.Tag{
-			Key:     "json",
-			Name:    goutil.SnakeString(field.Name()),
-			Options: []string{"omitempty"},
-		})
-	}*/
-
-	return true
-}
-
 // LoadDirs parses the source code of Go files under the directories and loads a new program.
 func LoadDirs(dirs ...string) (*aster.Program, error) {
 	p := aster.NewProgram()
@@ -48,6 +23,7 @@ func LoadDirs(dirs ...string) (*aster.Program, error) {
 			return nil
 		})
 		if err != nil {
+			fmt.Println("Error: ", err)
 			return nil, err
 		}
 	}

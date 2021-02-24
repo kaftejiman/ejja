@@ -6,6 +6,14 @@ import (
 )
 
 var module Module
+var modules []string
+
+func init() {
+	modules = []string{
+		"analyser",
+		"flattener",
+	}
+}
 
 // Module interface of modules
 type Module interface {
@@ -63,7 +71,6 @@ func Run(name string, project string, functions ...string) {
 
 	selection(name)
 	module.run(project, functions...)
-
 }
 
 // Manifest specified module
@@ -71,10 +78,14 @@ func Manifest(name string) {
 
 	selection(name)
 	module.manifest()
-
 }
 
 // List available modules
 func List() {
-	fmt.Println("list of available modules")
+	fmt.Println("_____________________________________________________________________")
+	for i := 0; i < len(modules); i++ {
+		Manifest(modules[i])
+		fmt.Println("_____________________________________________________________________")
+	}
+
 }

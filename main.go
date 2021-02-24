@@ -23,7 +23,7 @@ func init() {
 		usage = `
 Golang source code level obfuscator. 
 Usage:
-	ejja run --project <path> [--module <module> [--functions <functions>]]
+	ejja run --project <path> --module <module> [--functions <functions>]
 	ejja list
 	ejja -h | --help
 	ejja --version
