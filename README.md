@@ -20,20 +20,20 @@ Runs the selected module on the target project.
 Usage:
 
 ```
-λ ejja run --project "C:\Users\kaftejiman\obfuscators\ejja" --module "analyser"
+λ ejja run --project "C:\Users\kaftejiman\sampleGolangProject" --module "analyser"
 
-                === Object Summary ===
+=== Object Summary ===
 
-        basic objects        : 2
-        array objects        : 0
-        slice objects        : 0
-        struct objects       : 5
-        pointer objects      : 0
-        tuple objects        : 0
-        signature objects    : 29
-        interface objects    : 3
-        map objects          : 0
-        chan objects         : 0
+basic objects        : 2
+array objects        : 2
+slice objects        : 13
+struct objects       : 5
+pointer objects      : 2
+tuple objects        : 1
+signature objects    : 29
+interface objects    : 3
+map objects          : 0
+chan objects         : 1
 ```
 
 ![quickstart](https://raw.githubusercontent.com/kaftejiman/ejja/main/assets/quickstart.gif)
@@ -42,25 +42,36 @@ Usage:
 
 ### Analyser
 
-![analyser](https://raw.githubusercontent.com/kaftejiman/jamal/main/assets/analyser.png)
+Runs an analysis on the target project's codebase, returns summary of object analysis.
+
+* Name: analyser
+* Usage: `ejja --project="example/project" --module="analyser"`
 
 ### Flattener
 
-*before* *after*
-*example cfgs*
+Flattens the target function's control flow graph. [More](http://ac.inf.elte.hu/Vol_030_2009/003.pdf)
 
-![flattener](https://raw.githubusercontent.com/kaftejiman/jamal/main/assets/flattener.png)
+* Name: flattener
+* Usage: `ejja --project="example/project" --module="flattener" --function="main"`
+  
+*before* *after*
+
+*example cfgs from r2*
+
+
+## Install
+
+Install directions
 
 ## How to contribute your own module
 
-Each module should provide two required methods:
- * `manifest()` -- Module manifestation with a unique name and description.
- * `run()` -- The entry point of the module.
+Each module should export two required methods:
+ * `Manifest()` -- Module manifestation with a unique name and description.
+ * `Run()` -- The entry point of the module.
+
+You can find template module in samples folder.
 
 ## Known issues
-## Requirements
-
-* [Henrylee2cn aster](https://github.com/henrylee2cn/aster)
 
 ## Release Notes
 
