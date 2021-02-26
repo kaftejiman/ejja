@@ -1,7 +1,5 @@
 package another_test
 
-import "fmt"
-
 func testIf(a int) int {
 	if a == 0 {
 		return 1
@@ -9,6 +7,6 @@ func testIf(a int) int {
 	return 10
 }
 
-func main() {
+/*func main() {
 	fmt.Println(testIf(0))
-}
+}*/

@@ -3,8 +3,10 @@ package modules
 import (
 	"fmt"
 	"go/ast"
+	"go/printer"
+	"go/token"
+	"os"
 
-	aster "github.com/henrylee2cn/aster/aster"
 	"github.com/kaftejiman/ejja/utils"
 )
 
@@ -33,35 +35,80 @@ func (*FlattenerModule) manifest() {
 
 func (m *FlattenerModule) run(project string, functions ...string) {
 	fmt.Println("[+] Running flattener..")
-	functions = utils.Validate(functions)
-	program, _ := utils.LoadDirs(project)
+	targetFuncs := utils.FindFunctions(project, functions)
 
-	for i := range functions {
-		flatten(program, functions[i])
+	for i := range targetFuncs {
+		fmt.Printf("[+] Found function `%s` in `%s`, flattening..\n\n", targetFuncs[i].Name.Name, targetFuncs[i].Name.Name)
 	}
 
 }
 
-func flatten(program *aster.Program, function string) {
-	currFunction = function
-	program.Inspect(func(fa aster.Facade) bool {
+func flattenBlock(node ast.Node) {
 
-		if fa.Name() != currFunction {
+	whileLabel := utils.UniqueID()
+	switchVariable := utils.UniqueID()
+	entry := utils.UniqueID()
+	exit := utils.UniqueID()
+
+	resTransformedBlock := transformBlock(node, switchVariable, whileLabel, entry, exit)
+	fmt.Printf(`
+var %s string
+%s = %s
+while(%s != %s){
+	switch(%s){
+		%s
+	}
+\}
+	
+`, switchVariable, switchVariable, entry, switchVariable, exit, switchVariable, resTransformedBlock)
+}
+
+func transformBlock(node ast.Node, switchVariable string, whileLabel string, entry string, exit string) string {
+	blockParts := returnBlocks(node)
+	fset := token.NewFileSet()
+
+	for i := range blockParts {
+		printer.Fprint(os.Stdout, fset, blockParts[i])
+	}
+	return "something"
+}
+
+func returnBlocks(node ast.Node) []ast.DeclStmt {
+
+	out := []ast.DeclStmt{}
+	ast.Inspect(node, func(n ast.Node) bool {
+		fset := token.NewFileSet()
+		ret, ok := n.(*ast.DeclStmt)
+		if ok {
+			fmt.Println("\nfound block")
+			printer.Fprint(os.Stdout, fset, ret)
+			out = append(out, *ret)
 			return true
 		}
-		fmt.Printf("[+] Found function `%s` in `%s`, flattening..\n", currFunction, fa.File().Filename)
-		var rootNode ast.Node = fa.Node()
-		fmt.Println(rootNode)
-		//rootNode
+
 		return true
 	})
-	//_ = program.Rewrite()
+	return out
 }
 
-func flattenBlock() {
+func findDecl(node ast.Node) {
 
+	ast.Inspect(node, func(n ast.Node) bool {
+		// Find Return Statements
+		fset := token.NewFileSet()
+		ret, ok := n.(*ast.AssignStmt)
+		if ok {
+			//fmt.Printf("gendecl statement found on line %d:\n\t", fset.Position(ret.Pos()).Line)
+			printer.Fprint(os.Stdout, fset, ret)
+			return true
+		}
+		return true
+	})
 }
 
-func transformBlock() {
-
-}
+/*
+idea:
+1- parse target function
+2- populate collection of Stmt stacks
+3- pretty print according to template (flattening) by popping from collection
+*/

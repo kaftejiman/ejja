@@ -16,6 +16,13 @@ Runs the selected module on the target project.
 Usage:
 
 ```
+λ ejja run --project "C:\Users\kaftejiman\sampleGolangProject" --module "flattener" --function "main"
+
+[+] Running flattener..
+[+] Found function main in C:\Users\kaftejiman\sampleGolangProject\main.go, flattening..
+
+[+] Done.
+
 λ ejja run --project "C:\Users\kaftejiman\sampleGolangProject" --module "analyser"
 
 [+] Running analyser..
@@ -33,25 +40,11 @@ interface objects    : 3
 map objects          : 0
 chan objects         : 1
 
-λ ejja run --project "C:\Users\kaftejiman\sampleGolangProject" --module "flattener" --function "main"
-
-[+] Running flattener..
-[+] Found function main in C:\Users\kaftejiman\sampleGolangProject\main.go, flattening..
-
-[+] Done.
-
 ```
 
 ![quickstart](https://raw.githubusercontent.com/kaftejiman/ejja/main/assets/quickstart.gif)
 
 ## Available Modules
-
-### Analyser
-
-Runs an analysis on the target project's codebase, returns summary of object analysis.
-
-* Name: analyser
-* Usage: `ejja --project="example/project" --module="analyser"`
 
 ### Flattener
 
@@ -64,6 +57,12 @@ Flattens the target function's control flow graph. [More](http://ac.inf.elte.hu/
 
 *example cfgs from r2*
 
+### Analyser
+
+Runs an analysis on the target project's codebase, returns summary of object analysis.
+
+* Name: analyser
+* Usage: `ejja --project="example/project" --module="analyser"`
 
 ## Install
 
