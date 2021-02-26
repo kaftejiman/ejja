@@ -3,9 +3,6 @@ package modules
 import (
 	"fmt"
 	"go/ast"
-	"go/printer"
-	"go/token"
-	"os"
 
 	"github.com/kaftejiman/ejja/utils"
 )
@@ -35,63 +32,70 @@ func (*FlattenerModule) manifest() {
 
 func (m *FlattenerModule) run(project string, functions ...string) {
 	fmt.Println("[+] Running flattener..")
-	targetFuncs := utils.FindFunctions(project, functions)
 
-	for i := range targetFuncs {
-		fmt.Printf("[+] Found function `%s` in `%s`, flattening..\n\n", targetFuncs[i].Name.Name, targetFuncs[i].Name.Name)
+	var collections []utils.StatementCollection
+	var collectionElement utils.StatementCollection
+	collections = utils.ParseFunctions(project, functions, true)
+
+	//fmt.Println(collections)
+
+	for i := range collections {
+		collectionElement = collections[i]
+		flattenCollection(collectionElement)
 	}
 
 }
 
-func flattenBlock(node ast.Node) {
+type levels struct {
+	variable []string
+	label    []string
+}
+
+type breaks struct {
+	level []string
+	entry []string
+}
+
+type continues struct {
+	level []string
+	entry []string
+}
+
+func flattenCollection(collection utils.StatementCollection) {
 
 	whileLabel := utils.UniqueID()
 	switchVariable := utils.UniqueID()
 	entry := utils.UniqueID()
 	exit := utils.UniqueID()
+	var levels levels
+	var breaks breaks
+	var continues continues
 
-	resTransformedBlock := transformBlock(node, switchVariable, whileLabel, entry, exit)
+	varDeclarations := utils.ReturnAssignments(collection)
+	// if len(collection.ReturnStack) != 0 {
+
+	// }
+
+	//resTransformedBlock := transformBlock(stmts, switchVariable, whileLabel, entry, exit)
 	fmt.Printf(`
+%s
 var %s string
 %s = %s
 while(%s != %s){
-	switch(%s){
-		%s
-	}
-\}
-	
-`, switchVariable, switchVariable, entry, switchVariable, exit, switchVariable, resTransformedBlock)
+	switch(%s){`,
+		varDeclarations, switchVariable, switchVariable, entry, switchVariable, exit, switchVariable)
+
+	levels.label = append(levels.label, whileLabel)
+	levels.variable = append(levels.variable, switchVariable)
+
 }
 
-func transformBlock(node ast.Node, switchVariable string, whileLabel string, entry string, exit string) string {
-	blockParts := returnBlocks(node)
-	fset := token.NewFileSet()
+func transformBlock(stmts []ast.Stmt, switchVariable string, whileLabel string, entry string, exit string) string {
 
-	for i := range blockParts {
-		printer.Fprint(os.Stdout, fset, blockParts[i])
-	}
 	return "something"
 }
 
-func returnBlocks(node ast.Node) []ast.DeclStmt {
-
-	out := []ast.DeclStmt{}
-	ast.Inspect(node, func(n ast.Node) bool {
-		fset := token.NewFileSet()
-		ret, ok := n.(*ast.DeclStmt)
-		if ok {
-			fmt.Println("\nfound block")
-			printer.Fprint(os.Stdout, fset, ret)
-			out = append(out, *ret)
-			return true
-		}
-
-		return true
-	})
-	return out
-}
-
-func findDecl(node ast.Node) {
+/*func findDecl(node ast.Node) {
 
 	ast.Inspect(node, func(n ast.Node) bool {
 		// Find Return Statements
@@ -104,7 +108,7 @@ func findDecl(node ast.Node) {
 		}
 		return true
 	})
-}
+}*/
 
 /*
 idea:
