@@ -26,7 +26,7 @@ Usage:
     for c10hsl3m9cj2651d78mg != "c10hsl3m9cj2651d78ng" {
             switch(c10hsl3m9cj2651d78mg){
             case "c10hsl3m9cj2651d78n0":
-                    fmt.Println(sort(a))
+                    fmt.Println(Sort(a))
                     c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78o0"
                     break
             case "c10hsl3m9cj2651d78o0":

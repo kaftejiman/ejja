@@ -1,4 +1,4 @@
-package test
+package main
 
 import "fmt"
 
@@ -13,19 +13,35 @@ func fibonacci(n int) int {
 
 }
 
+func sort(numbers []int) []int {
+
+	for i := len(numbers); i > 0; i-- {
+		for j := 1; j < i; j++ {
+			if numbers[j-1] > numbers[j] {
+				intermediate := numbers[j]
+				numbers[j] = numbers[j-1]
+				numbers[j-1] = intermediate
+			}
+		}
+	}
+	return numbers
+}
+
 func main() {
 
-	// test sort
+	// variable assignment
 	a := []int{2, 212, 3001, 14, 501, 7800, 9932, 33, 45, 45, 45, 91, 99, 37, 102, 102, 104, 106, 109, 106}
+
+	// call expression
 	fmt.Println(sort(a))
 
-	// test if
+	// if statement
 	if 1 > 2 {
 		fmt.Println("no")
 	} else {
 		fmt.Println("yes")
 	}
 
-	// test fib
+	// call expression
 	fmt.Println(fibonacci(30))
 }
