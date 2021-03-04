@@ -72,6 +72,7 @@ interface objects    : 3
 map objects          : 0
 chan objects         : 1
 
+[+] Done.
 ```
 
 ## Available Modules

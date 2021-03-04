@@ -161,5 +161,6 @@ chan objects       : %d
 		summ.signatureObj, summ.interfaceObj, summ.mapObj,
 		summ.chanObj)
 
+	fmt.Println("[+] Done.")
 	return true
 }
