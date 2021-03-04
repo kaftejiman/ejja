@@ -7,9 +7,9 @@ Runs the selected module on the target project.
 
 *Please report any bugs you encounter.*
 
-## Architecture
+## Demonstration
 
-![architecture](https://raw.githubusercontent.com/kaftejiman/ejja/main/assets/architecture.png)
+![quickstart](https://raw.githubusercontent.com/kaftejiman/ejja/main/assets/quickstart.gif)
 
 ## Quick Start
 
@@ -74,8 +74,6 @@ map objects          : 0
 chan objects         : 1
 
 ```
-
-![quickstart](https://raw.githubusercontent.com/kaftejiman/ejja/main/assets/quickstart.gif)
 
 ## Available Modules
 
