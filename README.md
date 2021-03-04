@@ -1,6 +1,6 @@
 # ejja
 
-A modular Golang source code level control flow obfuscator, made in Golang.
+A modular Go source code level control flow obfuscator, made in Go.
 
 Runs the selected module on the target project.
 
@@ -14,7 +14,7 @@ Runs the selected module on the target project.
 Usage:
 
 ```golang
-λ go run main.go run --project "samples" --module "flattener" --functions "main"
+λ ejja run --project "samples" --module "flattener" --functions "main"
 [+] Running flattener..
 [+] Found function `main` in `main`..
 [+] Emitting body of the transformed function..
