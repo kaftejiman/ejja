@@ -42,6 +42,8 @@ func (m *FlattenerModule) run(project string, functions ...string) {
 		flattenCollection(collectionElement)
 	}
 
+	fmt.Println("\n[+] Done.")
+
 }
 
 type levels struct {

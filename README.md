@@ -15,11 +15,44 @@ Runs the selected module on the target project.
 
 Usage:
 
-```
-λ ejja run --project "C:\Users\kaftejiman\sampleGolangProject" --module "flattener" --function "main"
-
+```golang
+λ go run main.go run --project "samples" --module "flattener" --functions "main"
 [+] Running flattener..
-[+] Found function main in C:\Users\kaftejiman\sampleGolangProject\main.go, flattening..
+[+] Found function `main` in `main`..
+
+a := []int{2, 212, 3001, 14, 501, 7800, 9932, 33, 45, 45, 45, 91, 99, 37, 102, 102, 104, 106, 109, 106}
+
+var c10hsl3m9cj2651d78mg string
+c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78n0"
+for c10hsl3m9cj2651d78mg != "c10hsl3m9cj2651d78ng" {
+        switch(c10hsl3m9cj2651d78mg){
+        case "c10hsl3m9cj2651d78n0":
+                 fmt.Println(sort(a))
+                 c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78o0"
+                 break
+        case "c10hsl3m9cj2651d78o0":
+        if (1 > 2) {
+                 c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78p0"
+        }else{
+                 c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78pg"
+        }
+        break
+        case "c10hsl3m9cj2651d78p0":
+                 fmt.Println("no")
+                 c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78og"
+                 break
+                case "c10hsl3m9cj2651d78pg":
+                         fmt.Println("yes")
+                         c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78og"
+                         break
+        case "c10hsl3m9cj2651d78og":
+                 fmt.Println(fibonacci(30))
+                 c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78ng"
+                 break
+
+        }
+
+}
 
 [+] Done.
 
