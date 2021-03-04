@@ -105,11 +105,12 @@ Displays object metrics about the target project codebase, returns summary of ob
 Each module should export two required methods:
  * `Manifest()` -- Module manifestation with a unique name and description.
  * `Run()` -- The entry point of the module.
-
-You can find template module in samples folder.
+You can use helper functions found in utils. They provide basic ast operations.
+You can find a sample module in samples folder, move the sample module to `modules` folder for actually running.
 
 ## Known issues
-Flattening module is only supporting If Statements for now, I will be adding support for others soon.
+
+Flattening module is lacking a lot as of now, I will be adding support soon.
 ## Release Notes
 
 **[CHANGELOG](https://github.com/kaftejiman/ejja/blob/main/CHANGELOG.md)**
