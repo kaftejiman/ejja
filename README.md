@@ -5,8 +5,6 @@ A modular Golang source code level control flow obfuscator, made in Golang.
 Runs the selected module on the target project.
 
 
-*Please report any bugs you encounter.*
-
 ## Demonstration
 
 ![quickstart](https://raw.githubusercontent.com/kaftejiman/ejja/main/assets/quickstart.gif)
@@ -79,25 +77,26 @@ chan objects         : 1
 
 ### Flattener
 
-Flattens the target function's control flow graph. [More](http://ac.inf.elte.hu/Vol_030_2009/003.pdf)
+Flattens the target function's control flow graph.
+
+Implementation of the flattener algorithm in ["OBFUSCATING C++ PROGRAMS VIA CONTROL FLOW FLATTENING" by T. L ́aszl ́o and ́A. Kiss](http://ac.inf.elte.hu/Vol_030_2009/003.pdf)
 
 * Name: flattener
 * Usage: `ejja --project="example/project" --module="flattener" --function="main"`
-  
-*before* *after*
+* Description: *The idea behind control flow flattening is to transform the structure of the source code in such a way that the targets of branches cannot be easily determined by static analysis, thus hindering the comprehension of the program.*  
 
-*example cfgs from r2*
+![before to after](assets/before_after.png)
 
 ### Analyser
 
-Runs an analysis on the target project's codebase, returns summary of object analysis.
+Displays object metrics about the target project codebase, returns summary of object analysis.
 
 * Name: analyser
 * Usage: `ejja --project="example/project" --module="analyser"`
+* Description: *Runs an analysis on the target project's codebase, returns summary of object analysis.*
 
 ## Install
 
-Install directions
 
 ## How to contribute your own module
 
@@ -108,7 +107,7 @@ Each module should export two required methods:
 You can find template module in samples folder.
 
 ## Known issues
-
+Flattening module is only supporting If Statements for now, I will be adding support for others soon.
 ## Release Notes
 
 **[CHANGELOG](https://github.com/kaftejiman/ejja/blob/main/CHANGELOG.md)**
