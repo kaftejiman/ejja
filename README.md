@@ -87,11 +87,11 @@ Implementation of the flattener algorithm in ["OBFUSCATING C++ PROGRAMS VIA CONT
 * Usage: `ejja --project="example/project" --module="flattener" --function="main"`
 * Description: *The idea behind control flow flattening is to transform the structure of the source code in such a way that the targets of branches cannot be easily determined by static analysis, thus hindering the comprehension of the program.*  
 
-* Before/After source code level:
+#### Before/After source code level:
   
 ![before/after source code level](assets/before_after.png)
 
-* Before/After binary level (IDA 7.0):
+#### Before/After binary level (IDA 7.0):
 
 ![Before/After binary level (IDA 7.0)](assets/ida_comparison.png)
 
@@ -113,7 +113,9 @@ Displays object metrics about the target project codebase, returns summary of ob
 Each module should export two required methods:
  * `Manifest()` -- Module manifestation with a unique name and description.
  * `Run()` -- The entry point of the module.
+
 You can use helper functions found in utils. They provide basic ast operations.
+
 You can find a sample module in samples folder, move the sample module to `modules` folder for actually running.
 
 ## Known issues
