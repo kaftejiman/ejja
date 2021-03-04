@@ -39,10 +39,10 @@ for c10hsl3m9cj2651d78mg != "c10hsl3m9cj2651d78ng" {
                  fmt.Println("no")
                  c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78og"
                  break
-                case "c10hsl3m9cj2651d78pg":
-                         fmt.Println("yes")
-                         c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78og"
-                         break
+        case "c10hsl3m9cj2651d78pg":
+                fmt.Println("yes")
+                c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78og"
+                break
         case "c10hsl3m9cj2651d78og":
                  fmt.Println(fibonacci(30))
                  c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78ng"

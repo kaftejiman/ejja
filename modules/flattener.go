@@ -69,24 +69,28 @@ func flattenCollection(collection utils.StatementCollection) {
 	entry := utils.UniqueID()
 	exit := utils.UniqueID()
 	var levels levels
+	levels.tabs = 1
+
 	//var breaks breaks
 	//var continues continues
+	fmt.Printf("[+] Emitting body of the transformed function..\n\n")
 	collection = utils.ReturnAssignments(collection)
 
-	fmt.Printf(`
-var %s string
-%s = "%s"
-for %s != "%s" {
-	switch(%s){`,
-		switchVariable, switchVariable, entry, switchVariable, exit, switchVariable)
-	fmt.Println("")
+	fmt.Printf("%svar %s string\n", utils.GetTabs(levels.tabs), switchVariable)
+	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, entry)
+	fmt.Printf("%sfor %s != \"%s\" {\n", utils.GetTabs(levels.tabs), switchVariable, exit)
+	levels.tabs++
+	fmt.Printf("%sswitch(%s){\n", utils.GetTabs(levels.tabs), switchVariable)
+
 	levels.label = append(levels.label, whileLabel)
 	levels.variable = append(levels.variable, switchVariable)
-	levels.tabs = 1
+
 	transformBlock(collection.Listing, entry, exit, &levels)
 	levels.label = append(levels.label[:0], levels.label[1:]...)
-	fmt.Println("\n\t}")
-	fmt.Println("\n}")
+	fmt.Printf("%s}\n", utils.GetTabs(levels.tabs))
+	levels.tabs--
+	fmt.Printf("%s}\n", utils.GetTabs(levels.tabs))
+	levels.tabs--
 
 }
 
@@ -104,9 +108,6 @@ func transformBlock(stmts []ast.Stmt, entry string, exit string, levels *levels)
 		}
 
 		switch utils.GetNodeType(stmts[i]) {
-		// case "Block":
-		// 	transformBlock(stmts[i], entry, partExit)
-		// 	break
 		case "IfStmt":
 			transformIf(stmts[i], entry, partExit, *levels)
 			break
@@ -140,17 +141,14 @@ func transformExpr(stmt ast.Stmt, entry string, exit string, levels levels) {
 
 	currStmt := stmt.(*ast.ExprStmt)
 	switchVariable := levels.variable[0]
-	// setup tabs
-	tabs := ""
-	for i := 0; i < levels.tabs; i++ {
-		tabs = tabs + "\t"
-	}
 
 	// emit transformed code
-	fmt.Printf("%scase \"%s\": \n", tabs, entry)
-	fmt.Printf("%s\t %s\n", tabs, utils.FormatNode(currStmt))
-	fmt.Printf("%s\t %s = \"%s\" \n", tabs, switchVariable, exit)
-	fmt.Printf("%s\t break\n", tabs)
+	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
+	levels.tabs++
+	fmt.Printf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt))
+	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, exit)
+	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	levels.tabs = levels.tabs - 2
 
 }
 
@@ -162,12 +160,6 @@ func transformIf(stmt ast.Stmt, entry string, exit string, levels levels) {
 	elseEntry := exit
 	hasElse := false
 
-	// setup tabs
-	tabs := ""
-	for i := 0; i < levels.tabs; i++ {
-		tabs = tabs + "\t"
-	}
-
 	if currStmt.Else != nil {
 		hasElse = true
 	}
@@ -177,16 +169,21 @@ func transformIf(stmt ast.Stmt, entry string, exit string, levels levels) {
 	}
 
 	// emit transformed code
-	fmt.Printf("%scase \"%s\": \n", tabs, entry)
-	fmt.Printf("%sif (%s) {\n", tabs, utils.FormatNode(currStmt.Cond))
-	fmt.Printf("%s\t %s = \"%s\"\n", tabs, switchVariable, thenEntry)
-	fmt.Printf("%s}else{\n", tabs)
-	fmt.Printf("%s\t %s = \"%s\"\n", tabs, switchVariable, elseEntry)
-	fmt.Printf("%s}\n", tabs)
-	fmt.Printf("%sbreak\n", tabs)
+	fmt.Printf("%scase \"%s\": \n", utils.GetTabs(levels.tabs), entry)
+	levels.tabs++
+	fmt.Printf("%sif (%s) {\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Cond))
+	levels.tabs++
+	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, thenEntry)
+	levels.tabs--
+	fmt.Printf("%s}else{\n", utils.GetTabs(levels.tabs))
+	levels.tabs++
+	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, elseEntry)
+	levels.tabs--
+	fmt.Printf("%s}\n", utils.GetTabs(levels.tabs))
+	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	levels.tabs--
 	transformBlock(currStmt.Body.List, thenEntry, exit, &levels)
 	if hasElse {
-		levels.tabs++
 		transformBlock(currStmt.Else.(*ast.BlockStmt).List, elseEntry, exit, &levels)
 	}
 

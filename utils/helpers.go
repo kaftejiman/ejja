@@ -130,7 +130,7 @@ func findFunction(project string, function string, verbose bool) *ast.FuncDecl {
 				if ok {
 					if fn.Name.Name == function {
 						if verbose {
-							fmt.Printf("[+] Found function `%s` in `%s`..\n\n", fn.Name.Name, fn.Name.Name)
+							fmt.Printf("[+] Found function `%s` in `%s`..\n", fn.Name.Name, fn.Name.Name)
 						}
 						out = fn
 					}
@@ -252,7 +252,7 @@ func parseFunction(stmts []ast.Stmt) StatementCollection {
 func ReturnAssignments(collection StatementCollection) StatementCollection {
 
 	for i := range collection.AssignStack {
-		fmt.Printf(FormatNode(collection.AssignStack[i]) + "\n")
+		fmt.Printf("%s"+FormatNode(collection.AssignStack[i])+"\n", GetTabs(1))
 	}
 	collection = remove(collection)
 	return collection
@@ -268,4 +268,13 @@ func remove(collection StatementCollection) StatementCollection {
 		}
 	}
 	return collection
+}
+
+// GetTabs returns a string composing of wanted tabs
+func GetTabs(index int) string {
+	tabs := ""
+	for i := 0; i < index; i++ {
+		tabs = tabs + "\t"
+	}
+	return tabs
 }
