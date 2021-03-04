@@ -17,8 +17,6 @@ import (
 )
 
 // StatementCollection is a collection of all statements in target function as stacks
-// used when first parsing by pushing
-// used when emitting code by popping
 type StatementCollection struct {
 	AssignStack     []ast.Stmt
 	ExprStack       []ast.Stmt
@@ -40,6 +38,7 @@ type StatementCollection struct {
 	SelectStack     []ast.Stmt
 	ForStack        []ast.Stmt
 	RangeStack      []ast.Stmt
+	Listing         []ast.Stmt
 }
 
 // LoadDirs parses the source code of Go files under the directories and loads a new program.
@@ -131,7 +130,7 @@ func findFunction(project string, function string, verbose bool) *ast.FuncDecl {
 				if ok {
 					if fn.Name.Name == function {
 						if verbose {
-							fmt.Printf("[+] Found function `%s` in `%s`..\n", fn.Name.Name, fn.Name.Name)
+							fmt.Printf("[+] Found function `%s` in `%s`..\n\n", fn.Name.Name, fn.Name.Name)
 						}
 						out = fn
 					}
@@ -172,8 +171,6 @@ func parseFunction(stmts []ast.Stmt) StatementCollection {
 
 		case "IfStmt":
 			collection.IfStack = append(collection.IfStack, element)
-			//subCollection = parseFunction(element.(*ast.BlockStmt).List)
-			//collection.IfStack = append(collection.IfStack, subCollection)
 			break
 
 		case "BadStmt":
@@ -244,6 +241,7 @@ func parseFunction(stmts []ast.Stmt) StatementCollection {
 			collection.RangeStack = append(collection.RangeStack, element)
 			break
 		}
+		collection.Listing = append(collection.Listing, element)
 
 	}
 
@@ -251,10 +249,23 @@ func parseFunction(stmts []ast.Stmt) StatementCollection {
 }
 
 // ReturnAssignments returns the assignment statements as a string
-func ReturnAssignments(collection StatementCollection) string {
-	out := ""
+func ReturnAssignments(collection StatementCollection) StatementCollection {
+
 	for i := range collection.AssignStack {
-		out = out + FormatNode(collection.AssignStack[i]) + "\n"
+		fmt.Printf(FormatNode(collection.AssignStack[i]) + "\n")
 	}
-	return out
+	collection = remove(collection)
+	return collection
+}
+
+// remove assignment statements from the collection listing
+func remove(collection StatementCollection) StatementCollection {
+	for i := 0; i < len(collection.Listing); i++ {
+		for j := 0; j < len(collection.AssignStack); j++ {
+			if collection.Listing[i] == collection.AssignStack[j] {
+				collection.Listing = append(collection.Listing[:i], collection.Listing[i+1:]...)
+			}
+		}
+	}
+	return collection
 }

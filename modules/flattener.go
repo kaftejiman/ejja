@@ -37,8 +37,6 @@ func (m *FlattenerModule) run(project string, functions ...string) {
 	var collectionElement utils.StatementCollection
 	collections = utils.ParseFunctions(project, functions, true)
 
-	//fmt.Println(collections)
-
 	for i := range collections {
 		collectionElement = collections[i]
 		flattenCollection(collectionElement)
@@ -49,6 +47,7 @@ func (m *FlattenerModule) run(project string, functions ...string) {
 type levels struct {
 	variable []string
 	label    []string
+	tabs     int
 }
 
 type breaks struct {
@@ -68,51 +67,141 @@ func flattenCollection(collection utils.StatementCollection) {
 	entry := utils.UniqueID()
 	exit := utils.UniqueID()
 	var levels levels
-	var breaks breaks
-	var continues continues
+	//var breaks breaks
+	//var continues continues
+	collection = utils.ReturnAssignments(collection)
 
-	varDeclarations := utils.ReturnAssignments(collection)
-	// if len(collection.ReturnStack) != 0 {
-
-	// }
-
-	//resTransformedBlock := transformBlock(stmts, switchVariable, whileLabel, entry, exit)
 	fmt.Printf(`
-%s
 var %s string
-%s = %s
-while(%s != %s){
+%s = "%s"
+for %s != "%s" {
 	switch(%s){`,
-		varDeclarations, switchVariable, switchVariable, entry, switchVariable, exit, switchVariable)
-
+		switchVariable, switchVariable, entry, switchVariable, exit, switchVariable)
+	fmt.Println("")
 	levels.label = append(levels.label, whileLabel)
 	levels.variable = append(levels.variable, switchVariable)
+	levels.tabs = 1
+	transformBlock(collection.Listing, entry, exit, &levels)
+	levels.label = append(levels.label[:0], levels.label[1:]...)
+	fmt.Println("\n\t}")
+	fmt.Println("\n}")
 
 }
 
-func transformBlock(stmts []ast.Stmt, switchVariable string, whileLabel string, entry string, exit string) string {
+func transformBlock(stmts []ast.Stmt, entry string, exit string, levels *levels) string {
 
+	for i := range stmts {
+
+		partExit := ""
+		// exit setup
+		if stmts[i] == stmts[len(stmts)-1] {
+			// if last element
+			partExit = exit
+		} else {
+			partExit = utils.UniqueID()
+		}
+
+		switch utils.GetNodeType(stmts[i]) {
+		// case "Block":
+		// 	transformBlock(stmts[i], entry, partExit)
+		// 	break
+		case "IfStmt":
+			transformIf(stmts[i], entry, partExit, *levels)
+			break
+		case "SwitchStmt":
+			transformSwitch(stmts[i], entry, partExit, *levels)
+			break
+		case "ForStmt":
+			transformFor(stmts[i], entry, partExit, *levels)
+			break
+		case "RangeStmt":
+			transformRange(stmts[i], entry, partExit, *levels)
+			break
+		case "BranchStmt":
+			transformBranch(stmts[i], entry, partExit, *levels)
+			break
+		case "ExprStmt":
+			transformExpr(stmts[i], entry, partExit, *levels)
+			break
+		default:
+			fmt.Println("not implemented:")
+			fmt.Printf(utils.FormatNode(stmts[i]) + "\n")
+			break
+		}
+		entry = partExit
+
+	}
 	return "something"
 }
 
-/*func findDecl(node ast.Node) {
+func transformExpr(stmt ast.Stmt, entry string, exit string, levels levels) {
 
-	ast.Inspect(node, func(n ast.Node) bool {
-		// Find Return Statements
-		fset := token.NewFileSet()
-		ret, ok := n.(*ast.AssignStmt)
-		if ok {
-			//fmt.Printf("gendecl statement found on line %d:\n\t", fset.Position(ret.Pos()).Line)
-			printer.Fprint(os.Stdout, fset, ret)
-			return true
-		}
-		return true
-	})
-}*/
+	currStmt := stmt.(*ast.ExprStmt)
+	switchVariable := levels.variable[0]
+	// setup tabs
+	tabs := ""
+	for i := 0; i < levels.tabs; i++ {
+		tabs = tabs + "\t"
+	}
 
-/*
-idea:
-1- parse target function
-2- populate collection of Stmt stacks
-3- pretty print according to template (flattening) by popping from collection
-*/
+	// emit transformed code
+	fmt.Printf("%scase \"%s\": \n", tabs, entry)
+	fmt.Printf("%s\t %s\n", tabs, utils.FormatNode(currStmt))
+	fmt.Printf("%s\t %s = \"%s\" \n", tabs, switchVariable, exit)
+	fmt.Printf("%s\t break\n", tabs)
+
+}
+
+func transformIf(stmt ast.Stmt, entry string, exit string, levels levels) {
+
+	currStmt := stmt.(*ast.IfStmt)
+	switchVariable := levels.variable[0]
+	thenEntry := utils.UniqueID()
+	elseEntry := exit
+	hasElse := false
+
+	// setup tabs
+	tabs := ""
+	for i := 0; i < levels.tabs; i++ {
+		tabs = tabs + "\t"
+	}
+
+	if currStmt.Else != nil {
+		hasElse = true
+	}
+
+	if hasElse {
+		elseEntry = utils.UniqueID()
+	}
+
+	// emit transformed code
+	fmt.Printf("%scase \"%s\": \n", tabs, entry)
+	fmt.Printf("%sif (%s) {\n", tabs, utils.FormatNode(currStmt.Cond))
+	fmt.Printf("%s\t %s = \"%s\"\n", tabs, switchVariable, thenEntry)
+	fmt.Printf("%s}else{\n", tabs)
+	fmt.Printf("%s\t %s = \"%s\"\n", tabs, switchVariable, elseEntry)
+	fmt.Printf("%s}\n", tabs)
+	fmt.Printf("%sbreak\n", tabs)
+	transformBlock(currStmt.Body.List, thenEntry, exit, &levels)
+	if hasElse {
+		levels.tabs++
+		transformBlock(currStmt.Else.(*ast.BlockStmt).List, elseEntry, exit, &levels)
+	}
+
+}
+
+func transformBranch(stmt ast.Stmt, entry string, exit string, levels levels) {
+	//currStmt := stmt.(*ast.BranchStmt)
+}
+
+func transformFor(stmt ast.Stmt, entry string, exit string, levels levels) {
+	//currStmt := stmt.(*ast.ForStmt)
+}
+
+func transformRange(stmt ast.Stmt, entry string, exit string, levels levels) {
+	//currStmt := stmt.(*ast.RangeStmt)
+}
+
+func transformSwitch(stmt ast.Stmt, entry string, exit string, levels levels) {
+	//currStmt := stmt.(*ast.SwitchStmt)
+}
