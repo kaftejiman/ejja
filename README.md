@@ -87,11 +87,11 @@ Implementation of the flattener algorithm in ["OBFUSCATING C++ PROGRAMS VIA CONT
 * Usage: `ejja --project="example/project" --module="flattener" --function="main"`
 * Description: *The idea behind control flow flattening is to transform the structure of the source code in such a way that the targets of branches cannot be easily determined by static analysis, thus hindering the comprehension of the program.*  
 
-#### Before/After source code level:
+#### Before/After source code level
   
 ![before/after source code level](assets/before_after.png)
 
-#### Before/After binary level (IDA 7.0):
+#### Before/After binary level (IDA 7.0)
 
 ![Before/After binary level (IDA 7.0)](assets/ida_comparison.png)
 
