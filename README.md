@@ -16,42 +16,53 @@ Usage:
 ```golang
 λ ejja run --project "samples" --module "flattener" --functions "main"
 [+] Running flattener..
-[+] Found function `main` in `main`..
-[+] Emitting body of the transformed function..
+[+] Found function `main` in `test.go` ..
 
-    a := []int{2, 212, 3001, 14, 501, 7800, 9932, 33, 45, 45, 45, 91, 99, 37, 102, 102, 104, 106, 109, 106}
+[+] Emitting transformed function..
 
-    var c10hsl3m9cj2651d78mg string
-    c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78n0"
-    for c10hsl3m9cj2651d78mg != "c10hsl3m9cj2651d78ng" {
-            switch(c10hsl3m9cj2651d78mg){
-            case "c10hsl3m9cj2651d78n0":
-                    fmt.Println(Sort(a))
-                    c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78o0"
-                    break
-            case "c10hsl3m9cj2651d78o0":
-            if (1 > 2) {
-                    c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78p0"
-            }else{
-                    c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78pg"
-            }
-            break
-            case "c10hsl3m9cj2651d78p0":
-                    fmt.Println("no")
-                    c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78og"
-                    break
-            case "c10hsl3m9cj2651d78pg":
-                    fmt.Println("yes")
-                    c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78og"
-                    break
-            case "c10hsl3m9cj2651d78og":
-                    fmt.Println(fibonacci(30))
-                    c10hsl3m9cj2651d78mg = "c10hsl3m9cj2651d78ng"
-                    break
-
-            }
-
-    }
+func main(){
+        a := []int{2, 212, 3001, 14, 501, 7800, 9932, 33, 45, 45, 45, 91, 99, 37, 102, 102, 104, 106, 109, 106}
+        var c11apfbm9cj2dj36j3jg string
+        c11apfbm9cj2dj36j3jg = "c11apfbm9cj2dj36j3k0"
+        for c11apfbm9cj2dj36j3jg != "c11apfbm9cj2dj36j3kg" {
+                switch(c11apfbm9cj2dj36j3jg){
+                case "c11apfbm9cj2dj36j3k0":
+                        fmt.Println(sort(a))
+                        c11apfbm9cj2dj36j3jg = "c11apfbm9cj2dj36j3l0"
+                        break
+                case "c11apfbm9cj2dj36j3l0":
+                        if (1 > 2) {
+                                c11apfbm9cj2dj36j3jg = "c11apfbm9cj2dj36j3m0"
+                        }else{
+                                c11apfbm9cj2dj36j3jg = "c11apfbm9cj2dj36j3mg"
+                        }
+                        break
+                case "c11apfbm9cj2dj36j3mg":
+                        fmt.Println("yes")
+                        c11apfbm9cj2dj36j3jg = "c11apfbm9cj2dj36j3lg"
+                        break
+                case "c11apfbm9cj2dj36j3lg":
+                        i := 0
+                        c11apfbm9cj2dj36j3jg = "c11apfbm9cj2dj36j3o0"
+                        break
+                case "c11apfbm9cj2dj36j3o0":
+                        if i < 5 {
+                                c11apfbm9cj2dj36j3jg = "c11apfbm9cj2dj36j3ng"
+                        }else{
+                                c11apfbm9cj2dj36j3jg = "c11apfbm9cj2dj36j3n0"
+                        }
+                        break
+                case "c11apfbm9cj2dj36j3og":
+                        i++
+                        c11apfbm9cj2dj36j3jg = "c11apfbm9cj2dj36j3o0"
+                        break
+                case "c11apfbm9cj2dj36j3n0":
+                        fmt.Println(fibonacci(30))
+                        c11apfbm9cj2dj36j3jg = "c11apfbm9cj2dj36j3kg"
+                        break
+                }
+        }
+}
 
 [+] Done.
 

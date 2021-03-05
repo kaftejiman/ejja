@@ -74,7 +74,7 @@ func flattenCollection(collection utils.StatementCollection) {
 
 	var breaks breaks
 	var continues continues
-	fmt.Printf("\n[+] Emitting body of the transformed function..\n\n")
+	fmt.Printf("\n[+] Emitting transformed function..\n\n")
 
 	collection = utils.Remove(collection)
 
