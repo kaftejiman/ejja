@@ -81,7 +81,7 @@ chan objects         : 1
 
 Flattens the target function's control flow graph.
 
-Implementation of the flattener algorithm in ["OBFUSCATING C++ PROGRAMS VIA CONTROL FLOW FLATTENING" by T. L ́aszl ́o and ́A. Kiss](http://ac.inf.elte.hu/Vol_030_2009/003.pdf)
+Implementation of the flattener algorithm in ["OBFUSCATING C++ PROGRAMS VIA CONTROL FLOW FLATTENING" by T. L ́aszl ́o and ́A. Kiss](http://ac.inf.elte.hu/Vol_030_2009/003.pdf).
 
 * Name: flattener
 * Usage: `ejja --project="example/project" --module="flattener" --function="main"`
@@ -120,7 +120,12 @@ You can find a sample module in samples folder, move the sample module to `modul
 
 ## Known issues
 
-Flattening module is lacking a lot as of now, I will be adding support soon.
+Flattening module is lacking a lot as of now, I will be supporting more statements asap, feel free to PR.
+
+Supported statements:
+* ExprStatements
+* IfStatements
+* ForStatements
 ## Release Notes
 
 **[CHANGELOG](https://github.com/kaftejiman/ejja/blob/main/CHANGELOG.md)**

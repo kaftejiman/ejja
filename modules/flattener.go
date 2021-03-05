@@ -71,8 +71,8 @@ func flattenCollection(collection utils.StatementCollection) {
 	var levels levels
 	levels.tabs = 1
 
-	//var breaks breaks
-	//var continues continues
+	var breaks breaks
+	var continues continues
 	fmt.Printf("[+] Emitting body of the transformed function..\n\n")
 	collection = utils.ReturnAssignments(collection)
 
@@ -85,7 +85,7 @@ func flattenCollection(collection utils.StatementCollection) {
 	levels.label = append(levels.label, whileLabel)
 	levels.variable = append(levels.variable, switchVariable)
 
-	transformBlock(collection.Listing, entry, exit, &levels)
+	transformBlock(collection.Listing, entry, exit, &levels, &breaks, &continues)
 	levels.label = append(levels.label[:0], levels.label[1:]...)
 	fmt.Printf("%s}\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
@@ -94,7 +94,7 @@ func flattenCollection(collection utils.StatementCollection) {
 
 }
 
-func transformBlock(stmts []ast.Stmt, entry string, exit string, levels *levels) string {
+func transformBlock(stmts []ast.Stmt, entry string, exit string, levels *levels, breaks *breaks, continues *continues) string {
 
 	for i := range stmts {
 
@@ -115,7 +115,7 @@ func transformBlock(stmts []ast.Stmt, entry string, exit string, levels *levels)
 			transformSwitch(stmts[i], entry, partExit, *levels)
 			break
 		case "ForStmt":
-			transformFor(stmts[i], entry, partExit, *levels)
+			transformFor(stmts[i], entry, partExit, *levels, *breaks, *continues)
 			break
 		case "RangeStmt":
 			transformRange(stmts[i], entry, partExit, *levels)
@@ -182,19 +182,58 @@ func transformIf(stmt ast.Stmt, entry string, exit string, levels levels) {
 	fmt.Printf("%s}\n", utils.GetTabs(levels.tabs))
 	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
-	transformBlock(currStmt.Body.List, thenEntry, exit, &levels)
+	transformBlock(currStmt.Body.List, thenEntry, exit, &levels, nil, nil)
 	if hasElse {
-		transformBlock(currStmt.Else.(*ast.BlockStmt).List, elseEntry, exit, &levels)
+		transformBlock(currStmt.Else.(*ast.BlockStmt).List, elseEntry, exit, &levels, nil, nil)
 	}
+
+}
+
+func transformFor(stmt ast.Stmt, entry string, exit string, levels levels, breaks breaks, continues continues) {
+	currStmt := stmt.(*ast.ForStmt)
+	switchVariable := levels.variable[0]
+	bodyEntry := utils.UniqueID()
+	testEntry := utils.UniqueID()
+	incEntry := utils.UniqueID()
+
+	// emit transformed code
+	// case entry
+	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
+	levels.tabs++
+	fmt.Printf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Init))
+	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, testEntry)
+	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	levels.tabs--
+	// case test cond
+	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), testEntry)
+	levels.tabs++
+	fmt.Printf("%sif %s {\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Cond))
+	levels.tabs++
+	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, bodyEntry)
+	levels.tabs--
+	fmt.Printf("%s}else{\n", utils.GetTabs(levels.tabs))
+	levels.tabs++
+	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, exit)
+	levels.tabs--
+	fmt.Printf("%s}\n", utils.GetTabs(levels.tabs))
+	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	levels.tabs--
+	// case incrementation
+	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), incEntry)
+	levels.tabs++
+	fmt.Printf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Post))
+	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, testEntry)
+	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	levels.tabs--
+
+	breaks.entry = append(breaks.entry, exit)
+	continues.entry = append(continues.entry, entry)
+	transformBlock(currStmt.Body.List, bodyEntry, entry, &levels, &breaks, &continues)
 
 }
 
 func transformBranch(stmt ast.Stmt, entry string, exit string, levels levels) {
 	//currStmt := stmt.(*ast.BranchStmt)
-}
-
-func transformFor(stmt ast.Stmt, entry string, exit string, levels levels) {
-	//currStmt := stmt.(*ast.ForStmt)
 }
 
 func transformRange(stmt ast.Stmt, entry string, exit string, levels levels) {
