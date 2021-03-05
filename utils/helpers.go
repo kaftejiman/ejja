@@ -18,6 +18,8 @@ import (
 
 // StatementCollection is a collection of all statements in target function as stacks
 type StatementCollection struct {
+	FunctionSig     string
+	Listing         []ast.Stmt
 	AssignStack     []ast.Stmt
 	ExprStack       []ast.Stmt
 	IfStack         []ast.Stmt
@@ -38,7 +40,6 @@ type StatementCollection struct {
 	SelectStack     []ast.Stmt
 	ForStack        []ast.Stmt
 	RangeStack      []ast.Stmt
-	Listing         []ast.Stmt
 }
 
 // LoadDirs parses the source code of Go files under the directories and loads a new program.
@@ -63,7 +64,7 @@ func LoadDirs(dirs ...string) (*aster.Program, error) {
 	return p.Load()
 }
 
-// Validate Validates given functions removes empty functions if found exits when no function given
+// Validate given functions removes empty functions if found exits when no function given
 // returns the clean list of functions
 func Validate(functions []string) []string {
 	out := []string{}
@@ -84,7 +85,7 @@ func Validate(functions []string) []string {
 	return out
 }
 
-// UniqueID generates a unique identifier for variable assignments
+// UniqueID generates a unique identifier
 func UniqueID() string {
 	id := xid.New()
 	return id.String()
@@ -130,7 +131,7 @@ func findFunction(project string, function string, verbose bool) *ast.FuncDecl {
 				if ok {
 					if fn.Name.Name == function {
 						if verbose {
-							fmt.Printf("[+] Found function `%s` in `%s`..\n", fn.Name.Name, file.Name.Name)
+							fmt.Printf("[+] Found function `%s` in `%s.go` ..\n", fn.Name.Name, file.Name.Name)
 						}
 						out = fn
 					}
@@ -149,14 +150,24 @@ func ParseFunctions(project string, functions []string, verbose bool) []Statemen
 	targetFuncs := FindFunctions(project, functions, verbose)
 	out := []StatementCollection{}
 	for i := range targetFuncs {
-		out = append(out, parseFunction(targetFuncs[i].Body.List))
+		out = append(out, parseFunction(targetFuncs[i].Body.List, formatSignature(targetFuncs[i].Type, targetFuncs[i].Name)))
 	}
 	return out
 
 }
 
-func parseFunction(stmts []ast.Stmt) StatementCollection {
+func formatSignature(funcType *ast.FuncType, funcIdent *ast.Ident) string {
+	out := ""
+	ident := FormatNode(funcIdent)
+	ftype := FormatNode(funcType)
+	index := 4
+	out = out + ftype[:index] + " " + ident + ftype[index:]
+	return out
+}
+
+func parseFunction(stmts []ast.Stmt, signature string) StatementCollection {
 	collection := StatementCollection{}
+	collection.FunctionSig = signature
 	var element ast.Stmt
 	for i := range stmts {
 		element = stmts[i]
@@ -249,17 +260,19 @@ func parseFunction(stmts []ast.Stmt) StatementCollection {
 }
 
 // ReturnAssignments returns the assignment statements as a string
-func ReturnAssignments(collection StatementCollection) StatementCollection {
+// TODO: wrong logic, fix it asap
+func ReturnAssignments(collection StatementCollection) string {
 
+	out := ""
 	for i := range collection.AssignStack {
-		fmt.Printf("%s"+FormatNode(collection.AssignStack[i])+"\n", GetTabs(1))
+		out = out + fmt.Sprintf("%s"+FormatNode(collection.AssignStack[i])+"\n", GetTabs(1))
 	}
-	collection = remove(collection)
-	return collection
+
+	return out
 }
 
-// remove assignment statements from the collection listing
-func remove(collection StatementCollection) StatementCollection {
+// Remove assignment statements from the collection listing
+func Remove(collection StatementCollection) StatementCollection {
 	for i := 0; i < len(collection.Listing); i++ {
 		for j := 0; j < len(collection.AssignStack); j++ {
 			if collection.Listing[i] == collection.AssignStack[j] {

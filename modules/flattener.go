@@ -64,6 +64,7 @@ type continues struct {
 
 func flattenCollection(collection utils.StatementCollection) {
 
+	out := ""
 	whileLabel := utils.UniqueID()
 	switchVariable := utils.UniqueID()
 	entry := utils.UniqueID()
@@ -74,28 +75,35 @@ func flattenCollection(collection utils.StatementCollection) {
 	var breaks breaks
 	var continues continues
 	fmt.Printf("\n[+] Emitting body of the transformed function..\n\n")
-	collection = utils.ReturnAssignments(collection)
 
-	fmt.Printf("%svar %s string\n", utils.GetTabs(levels.tabs), switchVariable)
-	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, entry)
-	fmt.Printf("%sfor %s != \"%s\" {\n", utils.GetTabs(levels.tabs), switchVariable, exit)
+	collection = utils.Remove(collection)
+
+	out = out + fmt.Sprintf("%s{\n", collection.FunctionSig)
+	out = out + utils.ReturnAssignments(collection)
+	out = out + fmt.Sprintf("%svar %s string\n", utils.GetTabs(levels.tabs), switchVariable)
+	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, entry)
+	out = out + fmt.Sprintf("%sfor %s != \"%s\" {\n", utils.GetTabs(levels.tabs), switchVariable, exit)
 	levels.tabs++
-	fmt.Printf("%sswitch(%s){\n", utils.GetTabs(levels.tabs), switchVariable)
+	out = out + fmt.Sprintf("%sswitch(%s){\n", utils.GetTabs(levels.tabs), switchVariable)
 
 	levels.label = append(levels.label, whileLabel)
 	levels.variable = append(levels.variable, switchVariable)
 
-	transformBlock(collection.Listing, entry, exit, &levels, &breaks, &continues)
+	out = out + transformBlock(collection.Listing, entry, exit, &levels, &breaks, &continues)
 	levels.label = append(levels.label[:0], levels.label[1:]...)
-	fmt.Printf("%s}\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%s}\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
-	fmt.Printf("%s}\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%s}\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
+	out = out + fmt.Sprintf("%s}\n", utils.GetTabs(levels.tabs))
+	levels.tabs--
+	fmt.Printf("%s", out)
 
 }
 
 func transformBlock(stmts []ast.Stmt, entry string, exit string, levels *levels, breaks *breaks, continues *continues) string {
 
+	out := ""
 	for i := range stmts {
 
 		partExit := ""
@@ -109,28 +117,28 @@ func transformBlock(stmts []ast.Stmt, entry string, exit string, levels *levels,
 
 		switch utils.GetNodeType(stmts[i]) {
 		case "IfStmt":
-			transformIf(stmts[i], entry, partExit, *levels)
+			out = out + transformIf(stmts[i], entry, partExit, *levels)
 			break
 		case "SwitchStmt":
-			transformSwitch(stmts[i], entry, partExit, *levels)
+			out = out + transformSwitch(stmts[i], entry, partExit, *levels)
 			break
 		case "ForStmt":
-			transformFor(stmts[i], entry, partExit, *levels, *breaks, *continues)
+			out = out + transformFor(stmts[i], entry, partExit, *levels, *breaks, *continues)
 			break
 		case "RangeStmt":
-			transformRange(stmts[i], entry, partExit, *levels)
+			out = out + transformRange(stmts[i], entry, partExit, *levels)
 			break
 		case "BranchStmt":
-			transformBranch(stmts[i], entry, partExit, *levels)
+			out = out + transformBranch(stmts[i], entry, partExit, *levels)
 			break
 		case "ExprStmt":
-			transformExpr(stmts[i], entry, partExit, *levels)
+			out = out + transformExpr(stmts[i], entry, partExit, *levels)
 			break
 		case "ReturnStmt":
-			transformReturn(stmts[i], entry, partExit, *levels)
+			out = out + transformReturn(stmts[i], entry, partExit, *levels)
 			break
 		case "AssignStmt":
-			transformAssignment(stmts[i], entry, partExit, *levels)
+			out = out + transformAssignment(stmts[i], entry, partExit, *levels)
 			break
 		case "EmptyStmt":
 			break
@@ -143,26 +151,30 @@ func transformBlock(stmts []ast.Stmt, entry string, exit string, levels *levels,
 		entry = partExit
 
 	}
-	return "something for now"
+	return out
 }
 
-func transformExpr(stmt ast.Stmt, entry string, exit string, levels levels) {
+func transformExpr(stmt ast.Stmt, entry string, exit string, levels levels) string {
 
+	out := ""
 	currStmt := stmt.(*ast.ExprStmt)
 	switchVariable := levels.variable[0]
 
 	// emit transformed code
-	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
+	out = out + fmt.Sprintf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
 	levels.tabs++
-	fmt.Printf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt))
-	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, exit)
-	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt))
+	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, exit)
+	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs = levels.tabs - 2
+
+	return out
 
 }
 
-func transformIf(stmt ast.Stmt, entry string, exit string, levels levels) {
+func transformIf(stmt ast.Stmt, entry string, exit string, levels levels) string {
 
+	out := ""
 	currStmt := stmt.(*ast.IfStmt)
 	switchVariable := levels.variable[0]
 	thenEntry := utils.UniqueID()
@@ -178,27 +190,31 @@ func transformIf(stmt ast.Stmt, entry string, exit string, levels levels) {
 	}
 
 	// emit transformed code
-	fmt.Printf("%scase \"%s\": \n", utils.GetTabs(levels.tabs), entry)
+	out = out + fmt.Sprintf("%scase \"%s\": \n", utils.GetTabs(levels.tabs), entry)
 	levels.tabs++
-	fmt.Printf("%sif (%s) {\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Cond))
+	out = out + fmt.Sprintf("%sif (%s) {\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Cond))
 	levels.tabs++
-	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, thenEntry)
+	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, thenEntry)
 	levels.tabs--
-	fmt.Printf("%s}else{\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%s}else{\n", utils.GetTabs(levels.tabs))
 	levels.tabs++
-	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, elseEntry)
+	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, elseEntry)
 	levels.tabs--
-	fmt.Printf("%s}\n", utils.GetTabs(levels.tabs))
-	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%s}\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
 	transformBlock(currStmt.Body.List, thenEntry, exit, &levels, nil, nil)
 	if hasElse {
-		transformBlock(currStmt.Else.(*ast.BlockStmt).List, elseEntry, exit, &levels, nil, nil)
+		out = out + transformBlock(currStmt.Else.(*ast.BlockStmt).List, elseEntry, exit, &levels, nil, nil)
 	}
+
+	return out
 
 }
 
-func transformFor(stmt ast.Stmt, entry string, exit string, levels levels, breaks breaks, continues continues) {
+func transformFor(stmt ast.Stmt, entry string, exit string, levels levels, breaks breaks, continues continues) string {
+
+	out := ""
 	currStmt := stmt.(*ast.ForStmt)
 	switchVariable := levels.variable[0]
 	bodyEntry := utils.UniqueID()
@@ -207,71 +223,91 @@ func transformFor(stmt ast.Stmt, entry string, exit string, levels levels, break
 
 	// emit transformed code
 	// case entry
-	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
+	out = out + fmt.Sprintf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
 	levels.tabs++
-	fmt.Printf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Init))
-	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, testEntry)
-	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Init))
+	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, testEntry)
+	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
 	// case test cond
-	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), testEntry)
+	out = out + fmt.Sprintf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), testEntry)
 	levels.tabs++
-	fmt.Printf("%sif %s {\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Cond))
+	out = out + fmt.Sprintf("%sif %s {\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Cond))
 	levels.tabs++
-	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, bodyEntry)
+	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, bodyEntry)
 	levels.tabs--
-	fmt.Printf("%s}else{\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%s}else{\n", utils.GetTabs(levels.tabs))
 	levels.tabs++
-	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, exit)
+	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, exit)
 	levels.tabs--
-	fmt.Printf("%s}\n", utils.GetTabs(levels.tabs))
-	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%s}\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
 	// case incrementation
-	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), incEntry)
+	out = out + fmt.Sprintf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), incEntry)
 	levels.tabs++
-	fmt.Printf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Post))
-	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, testEntry)
-	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Post))
+	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, testEntry)
+	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
 
 	breaks.entry = append(breaks.entry, exit)
 	continues.entry = append(continues.entry, entry)
 	transformBlock(currStmt.Body.List, bodyEntry, entry, &levels, &breaks, &continues)
 
+	return out
+
 }
 
-func transformReturn(stmt ast.Stmt, entry string, exit string, levels levels) {
+func transformReturn(stmt ast.Stmt, entry string, exit string, levels levels) string {
+
+	out := ""
 	currStmt := stmt.(*ast.ReturnStmt)
 
-	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
+	out = out + fmt.Sprintf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
 	levels.tabs++
-	fmt.Printf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt))
-	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt))
+	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
+
+	return out
 
 }
 
-func transformAssignment(stmt ast.Stmt, entry string, exit string, levels levels) {
+func transformAssignment(stmt ast.Stmt, entry string, exit string, levels levels) string {
+
+	out := ""
+
 	currStmt := stmt.(*ast.AssignStmt)
 	switchVariable := levels.variable[0]
 
-	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
+	out = out + fmt.Sprintf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
 	levels.tabs++
-	fmt.Printf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt))
-	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, exit)
-	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	out = out + fmt.Sprintf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt))
+	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, exit)
+	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
+
+	return out
 }
 
-func transformBranch(stmt ast.Stmt, entry string, exit string, levels levels) {
+func transformBranch(stmt ast.Stmt, entry string, exit string, levels levels) string {
 	//currStmt := stmt.(*ast.BranchStmt)
+	out := ""
+
+	return out
 }
 
-func transformRange(stmt ast.Stmt, entry string, exit string, levels levels) {
+func transformRange(stmt ast.Stmt, entry string, exit string, levels levels) string {
 	//currStmt := stmt.(*ast.RangeStmt)
+	out := ""
+
+	return out
 }
 
-func transformSwitch(stmt ast.Stmt, entry string, exit string, levels levels) {
+func transformSwitch(stmt ast.Stmt, entry string, exit string, levels levels) string {
 	//currStmt := stmt.(*ast.SwitchStmt)
+	out := ""
+
+	return out
 }
