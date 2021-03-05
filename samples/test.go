@@ -42,6 +42,11 @@ func main() {
 		fmt.Println("yes")
 	}
 
+	// for statement
+	for i := 0; i < 5; i++ {
+		fmt.Println(i)
+	}
+
 	// call expression
 	fmt.Println(fibonacci(30))
 }
