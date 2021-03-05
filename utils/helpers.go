@@ -130,7 +130,7 @@ func findFunction(project string, function string, verbose bool) *ast.FuncDecl {
 				if ok {
 					if fn.Name.Name == function {
 						if verbose {
-							fmt.Printf("[+] Found function `%s` in `%s`..\n", fn.Name.Name, fn.Name.Name)
+							fmt.Printf("[+] Found function `%s` in `%s`..\n", fn.Name.Name, file.Name.Name)
 						}
 						out = fn
 					}

@@ -30,7 +30,7 @@ func (*FlattenerModule) manifest() {
 	`)
 }
 
-func (m *FlattenerModule) run(project string, functions ...string) {
+func (m *FlattenerModule) run(project string, rewrite bool, functions ...string) {
 	fmt.Println("[+] Running flattener..")
 
 	var collections []utils.StatementCollection
@@ -73,7 +73,7 @@ func flattenCollection(collection utils.StatementCollection) {
 
 	var breaks breaks
 	var continues continues
-	fmt.Printf("[+] Emitting body of the transformed function..\n\n")
+	fmt.Printf("\n[+] Emitting body of the transformed function..\n\n")
 	collection = utils.ReturnAssignments(collection)
 
 	fmt.Printf("%svar %s string\n", utils.GetTabs(levels.tabs), switchVariable)
@@ -126,15 +126,24 @@ func transformBlock(stmts []ast.Stmt, entry string, exit string, levels *levels,
 		case "ExprStmt":
 			transformExpr(stmts[i], entry, partExit, *levels)
 			break
+		case "ReturnStmt":
+			transformReturn(stmts[i], entry, partExit, *levels)
+			break
+		case "AssignStmt":
+			transformAssignment(stmts[i], entry, partExit, *levels)
+			break
+		case "EmptyStmt":
+			break
 		default:
 			fmt.Println("not implemented:")
 			fmt.Printf(utils.FormatNode(stmts[i]) + "\n")
+			fmt.Printf(utils.GetNodeType(stmts[i]) + "\n")
 			break
 		}
 		entry = partExit
 
 	}
-	return "something"
+	return "something for now"
 }
 
 func transformExpr(stmt ast.Stmt, entry string, exit string, levels levels) {
@@ -230,6 +239,29 @@ func transformFor(stmt ast.Stmt, entry string, exit string, levels levels, break
 	continues.entry = append(continues.entry, entry)
 	transformBlock(currStmt.Body.List, bodyEntry, entry, &levels, &breaks, &continues)
 
+}
+
+func transformReturn(stmt ast.Stmt, entry string, exit string, levels levels) {
+	currStmt := stmt.(*ast.ReturnStmt)
+
+	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
+	levels.tabs++
+	fmt.Printf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt))
+	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	levels.tabs--
+
+}
+
+func transformAssignment(stmt ast.Stmt, entry string, exit string, levels levels) {
+	currStmt := stmt.(*ast.AssignStmt)
+	switchVariable := levels.variable[0]
+
+	fmt.Printf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
+	levels.tabs++
+	fmt.Printf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt))
+	fmt.Printf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, exit)
+	fmt.Printf("%sbreak\n", utils.GetTabs(levels.tabs))
+	levels.tabs--
 }
 
 func transformBranch(stmt ast.Stmt, entry string, exit string, levels levels) {

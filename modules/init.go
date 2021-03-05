@@ -17,7 +17,7 @@ func init() {
 
 // Module interface of modules
 type Module interface {
-	run(project string, functions ...string)
+	run(project string, rewrite bool, functions ...string)
 	manifest()
 }
 
@@ -30,7 +30,7 @@ type template struct {
 
 type implement interface {
 	manifest()
-	run(project string, functions ...string)
+	run(project string, rewrite bool, functions ...string)
 }
 
 func newTemplate(impl implement) *template {
@@ -56,10 +56,10 @@ func selection(name string) {
 }
 
 // Run specified module with optional project argumnent
-func Run(name string, project string, functions ...string) {
+func Run(name string, project string, rewrite bool, functions ...string) {
 
 	selection(name)
-	module.run(project, functions...)
+	module.run(project, rewrite, functions...)
 }
 
 // Manifest specified module

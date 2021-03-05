@@ -41,7 +41,7 @@ func (*AnalyserModule) manifest() {
 	fmt.Printf("Description: %s\n", `Runs an analysis on the target project's codebase, returns summary of object analysis.`)
 }
 
-func (m *AnalyserModule) run(project string, functions ...string) {
+func (m *AnalyserModule) run(project string, rewrite bool, functions ...string) {
 	//fmt.Print("analyser is running with project path ", project, " functions are : ", functions, "\n")
 	generateSummary(project)
 }

@@ -14,6 +14,7 @@ var arguments struct {
 	Project   string `docopt:"-p,--project"`
 	Module    string `docopt:"-m,--module"`
 	Functions string `docopt:"-f,--functions"`
+	Rewrite   bool   `docopt:"-r,--rewrite"`
 	Verbose   bool   `docopt:"--verbose"`
 }
 
@@ -23,7 +24,7 @@ func init() {
 		usage = `
 Golang source code level obfuscator. 
 Usage:
-	ejja run --project <path> --module <module> [--functions <functions>]
+	ejja run --project <path> --module <module> [--functions <functions> --rewrite]
 	ejja list
 	ejja -h | --help
 	ejja --version
@@ -34,6 +35,7 @@ Usage:
 	-p --project <path>                     Absolute path to your Golang project. 
 	-m --module <module>                    The obfuscation module to apply on target project.
 	-f --functions <functions>              Target function or functions for obfuscation. Optional.
+	-r --rewrite                            Rewrite result to project codebase (careful, data gets changed)
 	-h --help                               Shows this screen.
 	--verbose                               Shows details.
 	--version                               Shows version.`
@@ -60,7 +62,7 @@ func main() {
 		modules.List()
 		break
 	case arguments.Run:
-		modules.Run(arguments.Module, arguments.Project, arguments.Functions)
+		modules.Run(arguments.Module, arguments.Project, arguments.Rewrite, arguments.Functions)
 		break
 	}
 
