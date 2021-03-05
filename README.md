@@ -137,6 +137,8 @@ Supported statements:
 * ExprStatements
 * IfStatements
 * ForStatements
+* ReturnStatements
+* AssignmentStatements
 ## Release Notes
 
 **[CHANGELOG](https://github.com/kaftejiman/ejja/blob/main/CHANGELOG.md)**
