@@ -132,6 +132,7 @@ You can find a sample module in samples folder, move the sample module to `modul
 ## Known issues
 
 Flattening module is lacking a lot as of now, I will be supporting more statements asap, feel free to PR.
+Issues with nested statements, will be fixed asap.
 
 Supported statements:
 * ExprStatements
