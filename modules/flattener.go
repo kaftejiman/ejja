@@ -76,7 +76,7 @@ func flattenCollection(collection utils.StatementCollection) {
 	var continues continues
 	fmt.Printf("\n[+] Emitting transformed function..\n\n")
 
-	collection = utils.Remove(collection)
+	//collection = utils.CalibrateCollection(collection)
 
 	out = out + fmt.Sprintf("%s{\n", collection.FunctionSig)
 	out = out + utils.ReturnAssignments(collection)
@@ -172,6 +172,7 @@ func transformExpr(stmt ast.Stmt, entry string, exit string, levels levels) stri
 
 }
 
+// wrong check again
 func transformIf(stmt ast.Stmt, entry string, exit string, levels levels) string {
 
 	out := ""
@@ -203,7 +204,7 @@ func transformIf(stmt ast.Stmt, entry string, exit string, levels levels) string
 	out = out + fmt.Sprintf("%s}\n", utils.GetTabs(levels.tabs))
 	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
-	transformBlock(currStmt.Body.List, thenEntry, exit, &levels, nil, nil)
+	out = out + transformBlock(currStmt.Body.List, thenEntry, exit, &levels, nil, nil)
 	if hasElse {
 		out = out + transformBlock(currStmt.Else.(*ast.BlockStmt).List, elseEntry, exit, &levels, nil, nil)
 	}

@@ -12,6 +12,8 @@ import (
 	"reflect"
 	"strings"
 
+	goastutils "golang.org/x/tools/go/ast/astutil"
+
 	"github.com/henrylee2cn/aster/aster"
 	"github.com/rs/xid"
 )
@@ -20,6 +22,8 @@ import (
 type StatementCollection struct {
 	FunctionSig     string
 	Listing         []ast.Stmt
+	FuncStack       []ast.FuncDecl
+	AssignDeclStack []ast.Stmt
 	AssignStack     []ast.Stmt
 	ExprStack       []ast.Stmt
 	IfStack         []ast.Stmt
@@ -66,9 +70,11 @@ func LoadDirs(dirs ...string) (*aster.Program, error) {
 
 // Validate given functions removes empty functions if found exits when no function given
 // returns the clean list of functions
+// TODO check for errornous lists
 func Validate(functions []string) []string {
 	out := []string{}
 	fn := []string{}
+
 	for i := range functions {
 		fn = strings.Split(functions[i], ",")
 		for j := range fn {
@@ -102,6 +108,88 @@ func FormatNode(node ast.Node) string {
 	buf := new(bytes.Buffer)
 	_ = format.Node(buf, token.NewFileSet(), node)
 	return buf.String()
+}
+
+// GetTabs returns a string composing of wanted tabs
+func GetTabs(index int) string {
+	tabs := ""
+	for i := 0; i < index; i++ {
+		tabs = tabs + "\t"
+	}
+	return tabs
+}
+
+// recursiveDeclAssignments finds declarations or declarative assignment statements recursively.
+// func recursiveDeclAssignments(function *ast.FuncDecl, collection StatementCollection) StatementCollection {
+
+// 	ast.Inspect(function, func(n ast.Node) bool {
+// 		assignment, ok := n.(*ast.AssignStmt)
+// 		decl, okk := n.(*ast.DeclStmt)
+
+// 		// if declarative statement
+// 		if ok {
+// 			if assignment.Tok.String() == ":=" {
+// 				collection.AssignDeclStack = append(collection.AssignDeclStack, assignment)
+// 			}
+
+// 		}
+
+// 		// if declaration
+// 		if okk {
+// 			collection.AssignDeclStack = append(collection.AssignDeclStack, decl)
+// 		}
+
+// 		return true
+// 	})
+
+// 	return collection
+// }
+
+// ReturnAssignments returns the assignment statements as a string
+func ReturnAssignments(collection StatementCollection) string {
+
+	out := ""
+	for i := range collection.AssignDeclStack {
+		out = out + fmt.Sprintf("%s"+FormatNode(collection.AssignDeclStack[i])+"\n", GetTabs(1))
+	}
+
+	return out
+}
+
+// calibrateFuncion removes assignment statements from the function node tree, returns calibrated function
+func calibrateFuncion(function *ast.FuncDecl, collection StatementCollection) (*ast.FuncDecl, StatementCollection) {
+
+	goastutils.Apply(function, func(cr *goastutils.Cursor) bool {
+
+		assignment, ok := cr.Node().(*ast.AssignStmt)
+		decl, okk := cr.Node().(*ast.DeclStmt)
+
+		if okk {
+			collection.AssignDeclStack = append(collection.AssignDeclStack, decl)
+			cr.Delete()
+		}
+
+		if ok {
+			if assignment.Tok.String() == ":=" {
+				collection.AssignDeclStack = append(collection.AssignDeclStack, assignment)
+				//cr.Delete()
+				// TODO: fix me cant delete me when I have no parent
+			}
+		}
+		return true
+	}, nil)
+
+	return function, collection
+}
+
+// formatSignature returns function's signature
+func formatSignature(funcType *ast.FuncType, funcIdent *ast.Ident) string {
+	out := ""
+	ident := FormatNode(funcIdent)
+	ftype := FormatNode(funcType)
+	index := 4
+	out = out + ftype[:index] + " " + ident + ftype[index:]
+	return out
 }
 
 // FindFunctions returns a list of *ast.FuncDecl matching given functions in a given folder path
@@ -150,144 +238,142 @@ func ParseFunctions(project string, functions []string, verbose bool) []Statemen
 	targetFuncs := FindFunctions(project, functions, verbose)
 	out := []StatementCollection{}
 	for i := range targetFuncs {
-		out = append(out, parseFunction(targetFuncs[i].Body.List, formatSignature(targetFuncs[i].Type, targetFuncs[i].Name)))
+		out = append(out, parseFunction(targetFuncs[i], formatSignature(targetFuncs[i].Type, targetFuncs[i].Name)))
 	}
 	return out
-
 }
 
-func formatSignature(funcType *ast.FuncType, funcIdent *ast.Ident) string {
-	out := ""
-	ident := FormatNode(funcIdent)
-	ftype := FormatNode(funcType)
-	index := 4
-	out = out + ftype[:index] + " " + ident + ftype[index:]
-	return out
+func returnListing(fn *ast.FuncDecl) []ast.Stmt {
+	return fn.Body.List
 }
 
-func parseFunction(stmts []ast.Stmt, signature string) StatementCollection {
+// parseFunction fills the statements collection with the statements found on target function recursively.
+func parseFunction(fn *ast.FuncDecl, signature string) StatementCollection {
+
 	collection := StatementCollection{}
 	collection.FunctionSig = signature
-	var element ast.Stmt
-	for i := range stmts {
-		element = stmts[i]
-		//subCollection := StatementCollection{}
-		switch GetNodeType(element) {
-		case "AssignStmt":
-			collection.AssignStack = append(collection.AssignStack, element)
-			break
-		case "ExprStmt":
-			collection.ExprStack = append(collection.ExprStack, element)
-			break
+	var ok bool
 
-		case "IfStmt":
-			collection.IfStack = append(collection.IfStack, element)
-			break
+	ast.Inspect(fn, func(n ast.Node) bool {
 
-		case "BadStmt":
-			collection.BadStack = append(collection.BadStack, element)
-			break
-
-		case "DeclStmt":
-			collection.DeclStack = append(collection.DeclStack, element)
-			break
-
-		case "EmptyStmt":
-			collection.EmptyStack = append(collection.EmptyStack, element)
-			break
-
-		case "LabeledStmt":
-			collection.LabeledStack = append(collection.LabeledStack, element)
-			break
-
-		case "SendStmt":
-			collection.SendStack = append(collection.SendStack, element)
-			break
-
-		case "IncDecStmt":
-			collection.IncDecStack = append(collection.IncDecStack, element)
-			break
-
-		case "GoStmt":
-			collection.GoStack = append(collection.GoStack, element)
-			break
-
-		case "DeferStmt":
-			collection.DeferStack = append(collection.DeferStack, element)
-			break
-
-		case "ReturnStmt":
-			collection.ReturnStack = append(collection.ReturnStack, element)
-			break
-
-		case "BranchStmt":
-			collection.BranchStack = append(collection.BranchStack, element)
-			break
-
-		case "BlockStmt":
-			collection.BlockStack = append(collection.BlockStack, element)
-			break
-
-		case "SwitchStmt":
-			collection.SwitchStack = append(collection.SwitchStack, element)
-			break
-
-		case "TypeSwitchStmt":
-			collection.TypeSwitchStack = append(collection.TypeSwitchStack, element)
-			break
-
-		case "CommClauseStmt":
-			collection.CommStack = append(collection.CommStack, element)
-			break
-
-		case "SelectStmt":
-			collection.SelectStack = append(collection.SelectStack, element)
-			break
-
-		case "ForStmt":
-			collection.ForStack = append(collection.ForStack, element)
-			break
-
-		case "RangeStmt":
-			collection.RangeStack = append(collection.RangeStack, element)
-			break
+		_, ok = n.(*ast.AssignStmt)
+		if ok {
+			collection.AssignStack = append(collection.AssignStack, n.(*ast.AssignStmt))
+			return true
 		}
-		collection.Listing = append(collection.Listing, element)
 
-	}
-
-	return collection
-}
-
-// ReturnAssignments returns the assignment statements as a string
-// TODO: wrong logic, fix it asap
-func ReturnAssignments(collection StatementCollection) string {
-
-	out := ""
-	for i := range collection.AssignStack {
-		out = out + fmt.Sprintf("%s"+FormatNode(collection.AssignStack[i])+"\n", GetTabs(1))
-	}
-
-	return out
-}
-
-// Remove assignment statements from the collection listing
-func Remove(collection StatementCollection) StatementCollection {
-	for i := 0; i < len(collection.Listing); i++ {
-		for j := 0; j < len(collection.AssignStack); j++ {
-			if collection.Listing[i] == collection.AssignStack[j] {
-				collection.Listing = append(collection.Listing[:i], collection.Listing[i+1:]...)
-			}
+		_, ok = n.(*ast.ExprStmt)
+		if ok {
+			collection.AssignStack = append(collection.ExprStack, n.(*ast.ExprStmt))
+			return true
 		}
-	}
-	return collection
-}
 
-// GetTabs returns a string composing of wanted tabs
-func GetTabs(index int) string {
-	tabs := ""
-	for i := 0; i < index; i++ {
-		tabs = tabs + "\t"
-	}
-	return tabs
+		_, ok = n.(*ast.IfStmt)
+		if ok {
+			collection.IfStack = append(collection.IfStack, n.(*ast.IfStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.BadStmt)
+		if ok {
+			collection.BadStack = append(collection.BadStack, n.(*ast.BadStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.DeclStmt)
+		if ok {
+			collection.DeclStack = append(collection.DeclStack, n.(*ast.DeclStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.EmptyStmt)
+		if ok {
+			collection.EmptyStack = append(collection.EmptyStack, n.(*ast.EmptyStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.LabeledStmt)
+		if ok {
+			collection.LabeledStack = append(collection.LabeledStack, n.(*ast.LabeledStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.SendStmt)
+		if ok {
+			collection.SendStack = append(collection.SendStack, n.(*ast.SendStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.IncDecStmt)
+		if ok {
+			collection.IncDecStack = append(collection.IncDecStack, n.(*ast.IncDecStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.GoStmt)
+		if ok {
+			collection.GoStack = append(collection.GoStack, n.(*ast.GoStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.DeferStmt)
+		if ok {
+			collection.DeferStack = append(collection.DeferStack, n.(*ast.DeferStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.ReturnStmt)
+		if ok {
+			collection.ReturnStack = append(collection.ReturnStack, n.(*ast.ReturnStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.BranchStmt)
+		if ok {
+			collection.BranchStack = append(collection.BranchStack, n.(*ast.BranchStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.BlockStmt)
+		if ok {
+			collection.BlockStack = append(collection.BlockStack, n.(*ast.BlockStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.SwitchStmt)
+		if ok {
+			collection.SwitchStack = append(collection.SwitchStack, n.(*ast.SwitchStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.TypeSwitchStmt)
+		if ok {
+			collection.TypeSwitchStack = append(collection.TypeSwitchStack, n.(*ast.TypeSwitchStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.SelectStmt)
+		if ok {
+			collection.SelectStack = append(collection.SelectStack, n.(*ast.SelectStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.ForStmt)
+		if ok {
+			collection.ForStack = append(collection.ForStack, n.(*ast.ForStmt))
+			return true
+		}
+
+		_, ok = n.(*ast.RangeStmt)
+		if ok {
+			collection.RangeStack = append(collection.RangeStack, n.(*ast.RangeStmt))
+			return true
+		}
+
+		return true
+	})
+
+	collection.Listing = returnListing(fn)
+	fn, collection = calibrateFuncion(fn, collection)
+	return collection
 }

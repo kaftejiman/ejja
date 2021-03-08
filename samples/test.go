@@ -104,10 +104,10 @@ func main() {
 	fmt.Println(sort(a))
 
 	// if statement
-	if 1 > 2 {
-		fmt.Println("no")
-	} else {
+	if len(a) >= 1 {
 		fmt.Println("yes")
+	} else {
+		fmt.Println("no")
 	}
 
 	// for statement
