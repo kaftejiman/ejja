@@ -92,6 +92,9 @@ func flattenCollection(collection utils.StatementCollection) {
 	out = out + fmt.Sprintf("%s}\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
 	out = out + fmt.Sprintf("%s}\n", utils.GetTabs(levels.tabs))
+	if len(collection.ReturnStack) != 0 {
+		out = out + fmt.Sprintf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(collection.ReturnStack[0]))
+	}
 	levels.tabs--
 	out = out + fmt.Sprintf("%s}\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
@@ -182,6 +185,7 @@ func transformIf(stmt ast.Stmt, entry string, exit string, levels levels) string
 	thenEntry := utils.UniqueID()
 	elseEntry := exit
 	hasElse := false
+	//specialEntry := entry
 
 	if currStmt.Else != nil {
 		hasElse = true

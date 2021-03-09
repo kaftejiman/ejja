@@ -126,7 +126,6 @@ func ReturnAssignments(collection StatementCollection) string {
 	for i := range collection.AssignDeclStack {
 		out = out + fmt.Sprintf("%s"+FormatNode(collection.AssignDeclStack[i])+"\n", GetTabs(1))
 	}
-
 	return out
 }
 
@@ -138,26 +137,37 @@ func getEmptyStatement() *ast.EmptyStmt {
 	}
 }
 
+// getAssignStatement returns an empty statement
+func getAssignStatement(stmt *ast.AssignStmt) *ast.AssignStmt {
+	return &ast.AssignStmt{
+		Lhs:    stmt.Lhs,
+		Rhs:    stmt.Rhs,
+		TokPos: stmt.TokPos,
+		Tok:    token.ASSIGN,
+	}
+}
+
 // calibrateFuncion removes assignent statements from the function node tree by replacing the statement with an empty statement, returns calibrated function
 // its wrong its just a workaround as I couldnt just delete the node..
 // TODO fixme
 func calibrateFunction(function *ast.FuncDecl, collection StatementCollection) (*ast.FuncDecl, StatementCollection) {
 
 	emptyStmt := getEmptyStatement()
+
 	goastutils.Apply(function, func(cr *goastutils.Cursor) bool {
 
-		assignment, ok := cr.Node().(*ast.AssignStmt)
-		decl, okk := cr.Node().(*ast.DeclStmt)
+		assignment, okAssign := cr.Node().(*ast.AssignStmt)
+		decl, okDecl := cr.Node().(*ast.DeclStmt)
 
-		if okk {
+		if okDecl {
 			collection.AssignDeclStack = append(collection.AssignDeclStack, decl)
 			cr.Replace(emptyStmt)
 		}
 
-		if ok {
+		if okAssign {
 			if assignment.Tok.String() == ":=" {
 				collection.AssignDeclStack = append(collection.AssignDeclStack, assignment)
-				cr.Replace(emptyStmt)
+				cr.Replace(getAssignStatement(assignment))
 			}
 		}
 		return true
