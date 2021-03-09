@@ -76,8 +76,6 @@ func flattenCollection(collection utils.StatementCollection) {
 	var continues continues
 	fmt.Printf("\n[+] Emitting transformed function..\n\n")
 
-	//collection = utils.CalibrateCollection(collection)
-
 	out = out + fmt.Sprintf("%s{\n", collection.FunctionSig)
 	out = out + utils.ReturnAssignments(collection)
 	out = out + fmt.Sprintf("%svar %s string\n", utils.GetTabs(levels.tabs), switchVariable)
@@ -116,6 +114,9 @@ func transformBlock(stmts []ast.Stmt, entry string, exit string, levels *levels,
 		}
 
 		switch utils.GetNodeType(stmts[i]) {
+		case "BlockStmt":
+			out = out + transformBlock((stmts[i]).(*ast.BlockStmt).List, entry, partExit, levels, breaks, continues)
+			break
 		case "IfStmt":
 			out = out + transformIf(stmts[i], entry, partExit, *levels)
 			break
@@ -221,17 +222,23 @@ func transformFor(stmt ast.Stmt, entry string, exit string, levels levels, break
 	bodyEntry := utils.UniqueID()
 	testEntry := utils.UniqueID()
 	incEntry := utils.UniqueID()
+	specialEntry := entry
 
 	// emit transformed code
 	// case entry
-	out = out + fmt.Sprintf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
-	levels.tabs++
-	out = out + fmt.Sprintf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Init))
-	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, testEntry)
-	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
-	levels.tabs--
+	if utils.GetNodeType(currStmt.Init) != "EmptyStmt" {
+		out = out + fmt.Sprintf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), entry)
+		levels.tabs++
+
+		out = out + fmt.Sprintf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Init))
+		out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, testEntry)
+		out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
+		levels.tabs--
+		specialEntry = testEntry
+	}
+
 	// case test cond
-	out = out + fmt.Sprintf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), testEntry)
+	out = out + fmt.Sprintf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), specialEntry)
 	levels.tabs++
 	out = out + fmt.Sprintf("%sif %s {\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Cond))
 	levels.tabs++
@@ -244,17 +251,18 @@ func transformFor(stmt ast.Stmt, entry string, exit string, levels levels, break
 	out = out + fmt.Sprintf("%s}\n", utils.GetTabs(levels.tabs))
 	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
+
 	// case incrementation
 	out = out + fmt.Sprintf("%scase \"%s\":\n", utils.GetTabs(levels.tabs), incEntry)
 	levels.tabs++
 	out = out + fmt.Sprintf("%s%s\n", utils.GetTabs(levels.tabs), utils.FormatNode(currStmt.Post))
-	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, testEntry)
+	out = out + fmt.Sprintf("%s%s = \"%s\"\n", utils.GetTabs(levels.tabs), switchVariable, specialEntry)
 	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
 
 	breaks.entry = append(breaks.entry, exit)
 	continues.entry = append(continues.entry, entry)
-	transformBlock(currStmt.Body.List, bodyEntry, entry, &levels, &breaks, &continues)
+	out = out + transformBlock(currStmt.Body.List, bodyEntry, incEntry, &levels, &breaks, &continues)
 
 	return out
 
@@ -278,6 +286,10 @@ func transformReturn(stmt ast.Stmt, entry string, exit string, levels levels) st
 func transformAssignment(stmt ast.Stmt, entry string, exit string, levels levels) string {
 
 	out := ""
+
+	if utils.GetNodeType(stmt) == "EmptyStmt" {
+		return out
+	}
 
 	currStmt := stmt.(*ast.AssignStmt)
 	switchVariable := levels.variable[0]

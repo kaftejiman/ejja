@@ -17,69 +17,6 @@ func fibonacci(n int) int {
 
 }
 
-// func sort(numbers []int) []int {
-
-// 	var c119pgbm9cj20m0udp00 string
-// 	i := len(numbers)
-// 	j := 1
-// 	intermediate := numbers[j]
-// 	c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp0g"
-// 	for c119pgbm9cj20m0udp00 != "c119pgbm9cj20m0udp10" {
-// 		switch c119pgbm9cj20m0udp00 {
-// 		case "c119pgbm9cj20m0udp0g":
-// 			c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp2g"
-// 			break
-// 		case "c119pgbm9cj20m0udp2g":
-// 			if i > 0 {
-// 				c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp20"
-// 			} else {
-// 				c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp1g"
-// 			}
-// 			break
-// 		case "c119pgbm9cj20m0udp30":
-// 			i--
-// 			c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp2g"
-// 			break
-// 		case "c119pgbm9cj20m0udp20":
-// 			c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp40"
-// 			break
-// 		case "c119pgbm9cj20m0udp40":
-// 			if j < i {
-// 				c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp3g"
-// 			} else {
-// 				c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp0g"
-// 			}
-// 			break
-// 		case "c119pgbm9cj20m0udp4g":
-// 			j++
-// 			c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp40"
-// 			break
-// 		case "c119pgbm9cj20m0udp3g":
-// 			if numbers[j-1] > numbers[j] {
-// 				c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp50"
-// 			} else {
-// 				c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp20"
-// 			}
-// 			break
-// 		case "c119pgbm9cj20m0udp50":
-// 			c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp5g"
-// 			break
-// 		case "c119pgbm9cj20m0udp5g":
-// 			numbers[j] = numbers[j-1]
-// 			c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp60"
-// 			break
-// 		case "c119pgbm9cj20m0udp60":
-// 			numbers[j-1] = intermediate
-// 			c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp20"
-// 			break
-// 		case "c119pgbm9cj20m0udp1g":
-// 			c119pgbm9cj20m0udp00 = "c119pgbm9cj20m0udp10"
-// 			break
-// 		}
-// 	}
-// 	return numbers
-// }
-
 // nested for/ if / return
 func sort(numbers []int) []int {
 

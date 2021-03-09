@@ -97,7 +97,7 @@ func UniqueID() string {
 	return id.String()
 }
 
-// GetNodeType returns a the given node's type
+// GetNodeType returns the given node's type
 func GetNodeType(node ast.Node) string {
 	val := reflect.ValueOf(node).Elem()
 	return val.Type().Name()
@@ -119,32 +119,6 @@ func GetTabs(index int) string {
 	return tabs
 }
 
-// recursiveDeclAssignments finds declarations or declarative assignment statements recursively.
-// func recursiveDeclAssignments(function *ast.FuncDecl, collection StatementCollection) StatementCollection {
-
-// 	ast.Inspect(function, func(n ast.Node) bool {
-// 		assignment, ok := n.(*ast.AssignStmt)
-// 		decl, okk := n.(*ast.DeclStmt)
-
-// 		// if declarative statement
-// 		if ok {
-// 			if assignment.Tok.String() == ":=" {
-// 				collection.AssignDeclStack = append(collection.AssignDeclStack, assignment)
-// 			}
-
-// 		}
-
-// 		// if declaration
-// 		if okk {
-// 			collection.AssignDeclStack = append(collection.AssignDeclStack, decl)
-// 		}
-
-// 		return true
-// 	})
-
-// 	return collection
-// }
-
 // ReturnAssignments returns the assignment statements as a string
 func ReturnAssignments(collection StatementCollection) string {
 
@@ -156,9 +130,20 @@ func ReturnAssignments(collection StatementCollection) string {
 	return out
 }
 
-// calibrateFuncion removes assignment statements from the function node tree, returns calibrated function
-func calibrateFuncion(function *ast.FuncDecl, collection StatementCollection) (*ast.FuncDecl, StatementCollection) {
+// getEmptyStatement returns an empty statement
+func getEmptyStatement() *ast.EmptyStmt {
+	return &ast.EmptyStmt{
+		Semicolon: token.Pos(0),
+		Implicit:  true,
+	}
+}
 
+// calibrateFuncion removes assignent statements from the function node tree by replacing the statement with an empty statement, returns calibrated function
+// its wrong its just a workaround as I couldnt just delete the node..
+// TODO fixme
+func calibrateFunction(function *ast.FuncDecl, collection StatementCollection) (*ast.FuncDecl, StatementCollection) {
+
+	emptyStmt := getEmptyStatement()
 	goastutils.Apply(function, func(cr *goastutils.Cursor) bool {
 
 		assignment, ok := cr.Node().(*ast.AssignStmt)
@@ -166,14 +151,13 @@ func calibrateFuncion(function *ast.FuncDecl, collection StatementCollection) (*
 
 		if okk {
 			collection.AssignDeclStack = append(collection.AssignDeclStack, decl)
-			cr.Delete()
+			cr.Replace(emptyStmt)
 		}
 
 		if ok {
 			if assignment.Tok.String() == ":=" {
 				collection.AssignDeclStack = append(collection.AssignDeclStack, assignment)
-				//cr.Delete()
-				// TODO: fix me cant delete me when I have no parent
+				cr.Replace(emptyStmt)
 			}
 		}
 		return true
@@ -243,8 +227,21 @@ func ParseFunctions(project string, functions []string, verbose bool) []Statemen
 	return out
 }
 
+// removeEmpty removes empty statements from collection statement listing
+func removeEmpty(stmts []ast.Stmt) []ast.Stmt {
+
+	out := []ast.Stmt{}
+	for i := range stmts {
+		if GetNodeType(stmts[i]) == "EmptyStmt" {
+			out = append(stmts[:i], stmts[i+1:]...)
+		}
+	}
+	return out
+}
+
+// returnListing returns a list of statements after being cleared from empty statements
 func returnListing(fn *ast.FuncDecl) []ast.Stmt {
-	return fn.Body.List
+	return removeEmpty(fn.Body.List)
 }
 
 // parseFunction fills the statements collection with the statements found on target function recursively.
@@ -254,6 +251,7 @@ func parseFunction(fn *ast.FuncDecl, signature string) StatementCollection {
 	collection.FunctionSig = signature
 	var ok bool
 
+	fn, collection = calibrateFunction(fn, collection)
 	ast.Inspect(fn, func(n ast.Node) bool {
 
 		_, ok = n.(*ast.AssignStmt)
@@ -374,6 +372,5 @@ func parseFunction(fn *ast.FuncDecl, signature string) StatementCollection {
 	})
 
 	collection.Listing = returnListing(fn)
-	fn, collection = calibrateFuncion(fn, collection)
 	return collection
 }
