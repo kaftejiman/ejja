@@ -206,6 +206,7 @@ func transformIf(stmt ast.Stmt, entry string, exit string, levels levels) string
 	out = out + fmt.Sprintf("%sbreak\n", utils.GetTabs(levels.tabs))
 	levels.tabs--
 	out = out + transformBlock(currStmt.Body.List, thenEntry, exit, &levels, nil, nil)
+
 	if hasElse {
 		out = out + transformBlock(currStmt.Else.(*ast.BlockStmt).List, elseEntry, exit, &levels, nil, nil)
 	}
@@ -304,15 +305,15 @@ func transformAssignment(stmt ast.Stmt, entry string, exit string, levels levels
 	return out
 }
 
-func transformBranch(stmt ast.Stmt, entry string, exit string, levels levels) string {
-	//currStmt := stmt.(*ast.BranchStmt)
+func transformRange(stmt ast.Stmt, entry string, exit string, levels levels) string {
+	//currStmt := stmt.(*ast.RangeStmt)
 	out := ""
 
 	return out
 }
 
-func transformRange(stmt ast.Stmt, entry string, exit string, levels levels) string {
-	//currStmt := stmt.(*ast.RangeStmt)
+func transformBranch(stmt ast.Stmt, entry string, exit string, levels levels) string {
+	//currStmt := stmt.(*ast.BranchStmt)
 	out := ""
 
 	return out

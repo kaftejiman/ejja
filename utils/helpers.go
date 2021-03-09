@@ -230,7 +230,7 @@ func ParseFunctions(project string, functions []string, verbose bool) []Statemen
 // removeEmpty removes empty statements from collection statement listing
 func removeEmpty(stmts []ast.Stmt) []ast.Stmt {
 
-	out := []ast.Stmt{}
+	out := stmts
 	for i := range stmts {
 		if GetNodeType(stmts[i]) == "EmptyStmt" {
 			out = append(stmts[:i], stmts[i+1:]...)
